@@ -1,9 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class UndoRedoStack : MonoBehaviour
 {
+    private Stack<IInputAction> _undoStack = new();
+    private Stack<IInputAction> _redoStack = new();
+
+    public Action<IInputAction, bool> UndoRedo;
     // Start is called before the first frame update
     void Start()
     {
@@ -16,11 +21,31 @@ public class UndoRedoStack : MonoBehaviour
         if((Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.LeftControl)) && Input.GetKey(KeyCode.LeftShift)
                 && Input.GetKeyDown(KeyCode.Z))
         {
-            Debug.Log("Redo");
+            Redo();
         }
         else if((Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.LeftControl)) && Input.GetKeyDown(KeyCode.Z))
         {
-            Debug.Log("Undo");
+            Undo();
+        }
+    }
+
+    void Undo()
+    {
+        if (_undoStack.Count > 0)
+        {
+            IInputAction action = _undoStack.Pop();
+            _redoStack.Push(action);
+            UndoRedo(action, true);
+        }
+    }
+
+    void Redo()
+    {
+        if(_redoStack.Count > 0)
+        {
+            IInputAction action = _redoStack.Pop();
+            _undoStack.Push(action);
+            UndoRedo(action, false);
         }
     }
 }
