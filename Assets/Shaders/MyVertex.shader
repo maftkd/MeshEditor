@@ -66,6 +66,11 @@ Shader "Unlit/MyVertex"
                 float2 diff = i.uv - float2(0.5, 0.5);
                 float dist = length(diff);
                 fixed4 col = 0;
+                bool selected = UNITY_ACCESS_INSTANCED_PROP(Props, _Selected);
+                if(selected)
+                {
+                    col.rgb = lerp(float3(1,1,1), float3(0,1,0), smoothstep(0.35, 0.25, dist));
+                }
                 col.a = smoothstep(0.5, 0.4, dist);
                 return col;
             }

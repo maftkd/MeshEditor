@@ -1,19 +1,9 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Vertex = SelectionManager.Vertex;
 
 public class MyMesh : MonoBehaviour
 {
-    public class Vertex
-    {
-        public Vector3 position;
-
-        public Vertex(Vector3 pos)
-        {
-            position = pos;
-        }
-    }
 
     public List<Vertex> vertices = new();
     
