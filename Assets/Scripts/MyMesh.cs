@@ -32,16 +32,4 @@ public class MyMesh : MonoBehaviour
     {
         
     }
-
-    private void OnDrawGizmos()
-    {
-        if (vertices != null && vertices.Count > 0)
-        {
-            Gizmos.color = Color.black;
-            foreach (Vertex v in vertices)
-            {
-                Gizmos.DrawSphere(transform.position + v.position, 0.1f);
-            }
-        }
-    }
 }

@@ -5,9 +5,10 @@ Shader "Unlit/MyVertex"
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags { "RenderType"="Opaque" "Queue"="Transparent" }
         LOD 100
 
+        Blend SrcAlpha OneMinusSrcAlpha
         Pass
         {
             CGPROGRAM
@@ -62,7 +63,10 @@ Shader "Unlit/MyVertex"
             fixed4 frag (v2f i) : SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(i);
+                float2 diff = i.uv - float2(0.5, 0.5);
+                float dist = length(diff);
                 fixed4 col = 0;
+                col.a = smoothstep(0.5, 0.4, dist);
                 return col;
             }
             ENDCG

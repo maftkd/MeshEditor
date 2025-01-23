@@ -29,12 +29,9 @@ public class MyMeshRenderer : MonoBehaviour
             Matrix4x4[] matrices = new Matrix4x4[numInstances];
             for (int i = 0; i < numInstances; ++i)
             {
-                matrices[i] = Matrix4x4.Translate(transform.position + myMesh.vertices[i].position) * Matrix4x4.Rotate(transform.rotation) *
-                              Matrix4x4.Scale(transform.localScale);
+                matrices[i] = Matrix4x4.Translate(transform.position + myMesh.vertices[i].position) * Matrix4x4.Rotate(Quaternion.identity) *
+                              Matrix4x4.Scale(Vector3.one);
             }
-            //materialPropertyBlock.SetFloatArray("_ShellIndex", shellIndexData);
-            //materialPropertyBlock.SetFloat("_NumShells", numInstances);
-            //materialPropertyBlock.SetFloat("_ShellOffset", data.shellTextureComponent.shellOffset);
 
             Graphics.DrawMeshInstanced(quadMesh, 0, _mat, matrices, numInstances, materialPropertyBlock, ShadowCastingMode.Off, false);
         }
