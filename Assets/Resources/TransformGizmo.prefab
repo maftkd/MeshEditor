@@ -447,7 +447,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4261031458844357126}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &1915333003606230688
 LineRenderer:
@@ -721,7 +721,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4261031458844357126}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &3962016330078177117
 LineRenderer:
@@ -856,8 +856,8 @@ Transform:
   - {fileID: 3431572605431077845}
   - {fileID: 3598558222497393136}
   - {fileID: 476337196596443588}
-  - {fileID: 388172693133303406}
   - {fileID: 2896126107684626906}
+  - {fileID: 388172693133303406}
   - {fileID: 3168601173834645116}
   - {fileID: 5423708159993354619}
   - {fileID: 5115874753174934474}

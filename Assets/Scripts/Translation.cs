@@ -15,6 +15,7 @@ public class Translation : MonoBehaviour
     private bool _translatingViaHotkey;
     private Vector3 _offset;
     private Camera _cam;
+    private Vector3 _axesConstraints = Vector3.one;
     
     //using the gizmo as a hint that the selection is ready to be translated, since its updated on selection change
     private bool _selectionReadyToTranslate => gizmoGO.activeSelf;
@@ -75,33 +76,9 @@ public class Translation : MonoBehaviour
 
     void Update()
     {
-        //this is like Blender's translate with the "G" key
-        if (_translatingViaHotkey)
-        {
-            // Determine where mouse ray falls on translation plane
-            if(ClickPhysics.RaycastMouseToPlaneAtPoint(_currentPos, _cam, out Vector3 hitPos))
-            {
-                HandleTranslationFromGizmo(hitPos - _offset);
-                gizmoGO.transform.position = _currentPos;
-            }
-
-            // lmb to Confirm translation
-            if (Input.GetMouseButtonDown(0))
-            {
-                OnTranslationComplete();
-                SetTranslationModeViaHotkey(false);
-            }
-            
-            // rmb to cancel translation
-            else if (Input.GetMouseButtonDown(1))
-            {
-                HandleTranslationFromGizmo(_startPos);
-                SetTranslationModeViaHotkey(false);
-            }
-        }
-        
         // If we have an active selection, listen for G hotkey as an alternate form of translation
-        if (_selectionReadyToTranslate)
+        // Also check that we aren't already dragging with th emouse
+        if (_selectionReadyToTranslate && !Input.GetMouseButton(0))
         {
             if (Input.GetKeyDown(KeyCode.G))
             {
@@ -112,6 +89,87 @@ public class Translation : MonoBehaviour
                 }
             }
         }
+        
+        if (_translatingViaHotkey)
+        {
+            
+            
+            // Axes constraints
+            if (Input.GetKeyDown(KeyCode.X))
+            {
+                if (Input.GetKey(KeyCode.LeftShift))
+                {
+                    _axesConstraints = Vector3.one - Vector3.right;
+                }
+                else
+                {
+                    _axesConstraints = Vector3.right;
+                }
+                SetLineGizmoVisibility();
+            }
+            else if (Input.GetKeyDown(KeyCode.Y))
+            {
+                if (Input.GetKey(KeyCode.LeftShift))
+                {
+                    _axesConstraints = Vector3.one - Vector3.up;
+                }
+                else
+                {
+                    _axesConstraints = Vector3.up;
+                }
+                SetLineGizmoVisibility();
+            }
+            else if (Input.GetKeyDown(KeyCode.Z))
+            {
+                if (Input.GetKey(KeyCode.LeftShift))
+                {
+                    _axesConstraints = Vector3.one - Vector3.forward;
+                }
+                else
+                {
+                    _axesConstraints = Vector3.forward;
+                }
+                SetLineGizmoVisibility();
+            }
+            
+            
+            
+            // Determine where mouse ray falls on translation plane
+            if(ClickPhysics.RaycastMouseToPlaneAtPoint(_currentPos, _cam, out Vector3 hitPos))
+            {
+                // some wackiness here for axis constraints
+                Vector3 tmpConstraint = _axesConstraints;
+                
+                // Essentially we first reset the selection to the start position with no constraints
+                _axesConstraints = Vector3.one;
+                HandleTranslationFromGizmo(_startPos);
+                
+                // Then we calculate the offset from the start position to the hit position including constraints
+                _axesConstraints = tmpConstraint;
+                HandleTranslationFromGizmo(hitPos - _offset);
+                
+                gizmoGO.transform.position = _currentPos;
+            }
+
+            
+            
+            // lmb to Confirm translation
+            if (Input.GetMouseButtonDown(0))
+            {
+                OnTranslationComplete();
+                SetTranslationModeViaHotkey(false);
+            }
+            
+            // rmb to cancel translation
+            else if (Input.GetMouseButtonDown(1))
+            {
+                _axesConstraints = Vector3.one;
+                HandleTranslationFromGizmo(_startPos);
+                SetTranslationModeViaHotkey(false);
+            }
+            
+            
+        }
     }
 
     void SetTranslationModeViaHotkey(bool translationEnabled)
@@ -121,17 +179,22 @@ public class Translation : MonoBehaviour
         selectionManager.selectionDisabled = translationEnabled;
         gizmoGO.transform.position = _currentPos;
         _startPos = _currentPos;
+        _axesConstraints = Vector3.one;
+        SetLineGizmoVisibility();
     }
 
     void HandleTranslationFromGizmo(Vector3 pos)
     {
         Vector3 delta = pos - _currentPos;
+        delta.x *= _axesConstraints.x;
+        delta.y *= _axesConstraints.y;
+        delta.z *= _axesConstraints.z;
         foreach (ISelectionPrimitive prim in selectionManager.selection)
         {
             SelectionManager.Vertex vertex = (SelectionManager.Vertex) prim;
             vertex.position += delta;
         }
-        _currentPos = pos;
+        _currentPos += delta;
     }
     
     void OnTranslationComplete()
@@ -150,6 +213,22 @@ public class Translation : MonoBehaviour
             }
             t.gameObject.SetActive(visible);
         }
+    }
+    
+    void SetLineGizmoVisibility()
+    {
+        if (_axesConstraints == Vector3.one)
+        {
+            foreach(GameObject line in lines)
+            {
+                line.SetActive(false);
+            }
+            return;
+        }
+        
+        lines[0].SetActive(_axesConstraints.x > 0.5f);
+        lines[1].SetActive(_axesConstraints.y > 0.5f);
+        lines[2].SetActive(_axesConstraints.z > 0.5f);
     }
     
     void OnUndoRedo(IInputAction action, bool wasUndo)
