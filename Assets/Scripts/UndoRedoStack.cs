@@ -9,6 +9,14 @@ public class UndoRedoStack : MonoBehaviour
     private Stack<IInputAction> _redoStack = new();
 
     public Action<IInputAction, bool> UndoRedo;
+    
+    public static UndoRedoStack Instance;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -35,7 +43,7 @@ public class UndoRedoStack : MonoBehaviour
         {
             IInputAction action = _undoStack.Pop();
             _redoStack.Push(action);
-            UndoRedo(action, true);
+            UndoRedo?.Invoke(action, true);
         }
     }
 
@@ -45,7 +53,13 @@ public class UndoRedoStack : MonoBehaviour
         {
             IInputAction action = _redoStack.Pop();
             _undoStack.Push(action);
-            UndoRedo(action, false);
+            UndoRedo?.Invoke(action, false);
         }
+    }
+    
+    public void PushAction(IInputAction action)
+    {
+        _undoStack.Push(action);
+        _redoStack.Clear();
     }
 }
