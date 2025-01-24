@@ -2,12 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
 
 public class Duplication : MonoBehaviour
 {
     public SelectionManager selectionManager;
     public MyMesh myMesh;
+    public UnityEvent OnDuplicate;
     // Start is called before the first frame update
     void Start()
     {
@@ -25,7 +27,8 @@ public class Duplication : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.D) && (Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.LeftControl)))
+        if(Input.GetKeyDown(KeyCode.D) && (Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.LeftControl) 
+                                                                             || Input.GetKey(KeyCode.LeftShift)))
         {
             List<ISelectionPrimitive> duplicatedPrimitives = new List<ISelectionPrimitive>();
             List<ISelectionPrimitive> previousSelection = new List<ISelectionPrimitive>(selectionManager.selection);
@@ -36,7 +39,8 @@ public class Duplication : MonoBehaviour
                 myMesh.vertices.Add((SelectionManager.Vertex)prim);
             }
             selectionManager.SetSelection(duplicatedPrimitives);
-            UndoRedoStack.Instance.Push(new DuplicateAction(duplicatedPrimitives, previousSelection));
+            //UndoRedoStack.Instance.Push(new DuplicateAction(duplicatedPrimitives, previousSelection));
+            OnDuplicate?.Invoke();
         }
     }
     

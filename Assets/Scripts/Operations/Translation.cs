@@ -82,11 +82,7 @@ public class Translation : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.G))
             {
-                if (ClickPhysics.RaycastMouseToPlaneAtPoint(_startPos, _cam, out Vector3 hitPos))
-                {
-                    _offset = hitPos - _startPos;
-                    SetHotkeyTranslation(true);
-                }
+                HotkeyTranslate();
             }
         }
         
@@ -173,7 +169,16 @@ public class Translation : MonoBehaviour
         }
     }
 
-    void SetHotkeyTranslation(bool translationEnabled)
+    public void HotkeyTranslate()
+    {
+        if (ClickPhysics.RaycastMouseToPlaneAtPoint(_startPos, _cam, out Vector3 hitPos))
+        {
+            _offset = hitPos - _startPos;
+            SetHotkeyTranslation(true);
+        }
+    }
+
+    public void SetHotkeyTranslation(bool translationEnabled)
     {
         //toggle state flag
         _hotkeyTranslation = translationEnabled;
