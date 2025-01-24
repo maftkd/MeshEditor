@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using UnityEngine;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
 
-public class InputAction
-{
-}
-
+/// <summary>
+/// This file contains structures needed for the Undo / Redo stack
+/// Technically these could also be used for some sort of automated testing / networking
+/// </summary>
 public interface IInputAction
 {
 }

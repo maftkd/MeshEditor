@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using SelectionMode = SelectionManager.SelectionMode;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
@@ -10,8 +7,8 @@ public class ClickPhysics : MonoBehaviour
 {
     public MyMesh mesh;
     private float vertexWidthPercentage = 0.01f;
-
     private Camera _cam;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -33,12 +30,17 @@ public class ClickPhysics : MonoBehaviour
     {
         float minT = float.MaxValue;
         Vertex closestVertex = null;
+        
         foreach (Vertex v in mesh.vertices)
         {
+            //this plane raycast is dual purpose
+            //1) it confirms that the sphere is in front of the camera
+            //2) it gives us the z-distance of the vertex in view space
             Plane plane = new Plane(_cam.transform.forward, v.position);
             Ray camForwardRay = new Ray(_cam.transform.position, _cam.transform.forward);
             if (plane.Raycast(camForwardRay, out float distance))
             {
+                //use z-dist to scale the radius such that all vertices have equal size on screen
                 float width = Mathf.Tan(_cam.fieldOfView * Mathf.Deg2Rad) * distance;
                 float radius = width * vertexWidthPercentage;
                 

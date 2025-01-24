@@ -1,9 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+/// <summary>
+/// Note that the "mesh" we are rendering here is not necessary a GL mesh with tris, normals, etc.
+/// It is primarily a visualization of the "selection" primitives that the user can manipulate to form the model
+/// The GL mesh, fbx/obj, whatever will be generated from this data
+/// </summary>
 public class MyMeshRenderer : MonoBehaviour
 {
     public Shader myVertexShader;

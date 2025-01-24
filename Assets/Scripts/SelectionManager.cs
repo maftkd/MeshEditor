@@ -64,8 +64,10 @@ public class SelectionManager : MonoBehaviour
                 return;
             }
             
+            //track previous selection for the undo/redo stack
             List<ISelectionPrimitive> prevSelection = new List<ISelectionPrimitive>(_selection);
             
+            //left shift is used for multi select, so when it's not pressed, we clear previous selection
             if (!Input.GetKey(KeyCode.LeftShift))
             {
                 ClearSelection();
@@ -74,7 +76,6 @@ public class SelectionManager : MonoBehaviour
             ISelectionPrimitive hit = clickPhysics.Raycast(ray, selectionMode);
             if (hit != null)
             {
-                
                 if (!_selection.Contains(hit))
                 {
                     Select(hit);
@@ -82,6 +83,7 @@ public class SelectionManager : MonoBehaviour
             }
             
             UndoRedoStack.Instance.PushAction(new SelectAction(prevSelection, _selection));
+            
             SelectionChanged?.Invoke();
         }
     }

@@ -1,9 +1,11 @@
-// code from https://gist.github.com/RodGreen/8d5f5452c459755d9bf6bad1015ef194
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.ShortcutManagement;
 using System.Linq;
 
+/// <summary>
+/// code from https://gist.github.com/RodGreen/8d5f5452c459755d9bf6bad1015ef194 
+/// </summary>
 [InitializeOnLoad]
 public class SwitchShortcutsProfileOnPlay
 {
