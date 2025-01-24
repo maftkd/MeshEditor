@@ -23,6 +23,7 @@ public class SelectionManager : MonoBehaviour
     {
         public bool selected { get; set; }
 
+        public ISelectionPrimitive Copy();
     }
     
     public class Vertex : ISelectionPrimitive
@@ -33,6 +34,11 @@ public class SelectionManager : MonoBehaviour
         public Vertex(Vector3 pos)
         {
             position = pos;
+        }
+        
+        public ISelectionPrimitive Copy()
+        {
+            return new Vertex(position);
         }
     }
     

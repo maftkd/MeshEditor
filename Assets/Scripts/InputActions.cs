@@ -41,3 +41,15 @@ public class DeleteAction : IInputAction
         this.deletedPrimitives = deletedPrimitives;
     }
 }
+
+public class DuplicateAction : IInputAction
+{
+    public List<ISelectionPrimitive> duplicatedPrimitives;
+    public List<ISelectionPrimitive> previousSelection;
+    
+    public DuplicateAction(List<ISelectionPrimitive> duplicatedPrimitives, List<ISelectionPrimitive> previousSelection)
+    {
+        this.duplicatedPrimitives = duplicatedPrimitives;
+        this.previousSelection = previousSelection;
+    }
+}
