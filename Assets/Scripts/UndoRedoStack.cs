@@ -56,7 +56,7 @@ public class UndoRedoStack : MonoBehaviour
         }
     }
     
-    public void PushAction(IInputAction action)
+    public void Push(IInputAction action)
     {
         _undoStack.Push(action);
         _redoStack.Clear();

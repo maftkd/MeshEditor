@@ -199,7 +199,7 @@ public class Translation : MonoBehaviour
     
     void OnTranslationComplete()
     {
-        UndoRedoStack.Instance.PushAction(new TranslateAction(_currentPos - _startPos));
+        UndoRedoStack.Instance.Push(new TranslateAction(_currentPos - _startPos));
         _startPos = _currentPos;
     }
 

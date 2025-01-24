@@ -31,3 +31,13 @@ public class TranslateAction : IInputAction
         this.delta = delta;
     }
 }
+
+public class DeleteAction : IInputAction
+{
+    public List<ISelectionPrimitive> deletedPrimitives;
+    
+    public DeleteAction(List<ISelectionPrimitive> deletedPrimitives)
+    {
+        this.deletedPrimitives = deletedPrimitives;
+    }
+}

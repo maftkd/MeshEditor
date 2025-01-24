@@ -89,7 +89,7 @@ public class SelectionManager : MonoBehaviour
                 }
             }
             
-            UndoRedoStack.Instance.PushAction(new SelectAction(prevSelection, _selection));
+            UndoRedoStack.Instance.Push(new SelectAction(prevSelection, _selection));
             
             SelectionChanged?.Invoke();
         }
@@ -107,13 +107,24 @@ public class SelectionManager : MonoBehaviour
         prim.selected = false;
     }
 
-    void ClearSelection()
+    public void ClearSelection()
     {
         foreach (ISelectionPrimitive prim in _selection)
         {
             prim.selected = false;
         }
         _selection.Clear();
+        SelectionChanged?.Invoke();
+    }
+    
+    public void SetSelection(List<ISelectionPrimitive> newSelection)
+    {
+        ClearSelection();
+        foreach (ISelectionPrimitive prim in newSelection)
+        {
+            Select(prim);
+        }
+        SelectionChanged?.Invoke();
     }
     
     void OnUndoRedo(IInputAction action, bool wasUndo)
