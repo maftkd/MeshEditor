@@ -108,6 +108,11 @@ public class SelectionManager : MonoBehaviour
         }
         else if (Input.GetMouseButton(0))
         {
+            // this means selection was disabled and we never properly received mouse down
+            if(_boxStart == Vector3.zero)
+            {
+                return;
+            }
             _boxEnd = Input.mousePosition;
             float boxMinX = Mathf.Min(_boxStart.x, _boxEnd.x);
             float boxMaxX = Mathf.Max(_boxStart.x, _boxEnd.x);
@@ -119,8 +124,16 @@ public class SelectionManager : MonoBehaviour
         }
         else if (Input.GetMouseButtonUp(0))
         {
+            // this means selection was disabled and we never properly received mouse down
+            if(_boxStart == Vector3.zero)
+            {
+                return;
+            }
             UndoRedoStack.Instance.Push(new SelectAction(_prevSelection, _selection));
             Shader.SetGlobalVector("_Box", Vector4.zero);
+            
+            //a marker that the click is complete - use this to avoid additional mouse events when selection is disabled
+            _boxStart = Vector3.zero;
         }
     }
 
