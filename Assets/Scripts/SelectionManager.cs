@@ -7,7 +7,8 @@ public class SelectionManager : MonoBehaviour
 {
     private Camera _cam;
     public ClickPhysics clickPhysics;
-    private List<ISelectionPrimitive> _selection = new();
+    public List<ISelectionPrimitive> _selection = new();
+    public Action SelectionChanged;
     
     public enum SelectionMode
     {
@@ -55,13 +56,20 @@ public class SelectionManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
+            Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
+            
+            //ignore any clicks that hit a Unity collider which we are using for gizmos
+            if(Physics.Raycast(_cam.transform.position, ray.direction))
+            {
+                return;
+            }
+            
             List<ISelectionPrimitive> prevSelection = new List<ISelectionPrimitive>(_selection);
+            
             if (!Input.GetKey(KeyCode.LeftShift))
             {
                 ClearSelection();
             }
-            
-            Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
             
             ISelectionPrimitive hit = clickPhysics.Raycast(ray, selectionMode);
             if (hit != null)
@@ -74,6 +82,7 @@ public class SelectionManager : MonoBehaviour
             }
             
             UndoRedoStack.Instance.PushAction(new SelectAction(prevSelection, _selection));
+            SelectionChanged?.Invoke();
         }
     }
 
@@ -81,6 +90,12 @@ public class SelectionManager : MonoBehaviour
     {
         _selection.Add(prim);
         prim.selected = true;
+    }
+    
+    void Deselect(ISelectionPrimitive prim)
+    {
+        _selection.Remove(prim);
+        prim.selected = false;
     }
 
     void ClearSelection()
@@ -100,30 +115,27 @@ public class SelectionManager : MonoBehaviour
             {
                 foreach (ISelectionPrimitive prim in selectAction.newSelection)
                 {
-                    prim.selected = false;
-                    _selection.Remove(prim);
+                    Deselect(prim);
                 }
                 
                 foreach (ISelectionPrimitive prim in selectAction.prevSelection)
                 {
-                    prim.selected = true;
-                    _selection.Add(prim);
+                    Select(prim);
                 }
             }
             else
             {
                 foreach (ISelectionPrimitive prim in selectAction.prevSelection)
                 {
-                    prim.selected = false;
-                    _selection.Remove(prim);
+                    Deselect(prim);
                 }
                 
                 foreach (ISelectionPrimitive prim in selectAction.newSelection)
                 {
-                    prim.selected = true;
-                    _selection.Add(prim);
+                    Select(prim);
                 }
             }
         }
+        SelectionChanged?.Invoke();
     }
 }
