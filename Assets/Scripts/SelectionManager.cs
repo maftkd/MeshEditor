@@ -59,7 +59,7 @@ public class SelectionManager : MonoBehaviour
             Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
             
             //ignore any clicks that hit a Unity collider which we are using for gizmos
-            if(Physics.Raycast(_cam.transform.position, ray.direction))
+            if(Physics.Raycast(ray.origin, ray.direction))
             {
                 return;
             }
