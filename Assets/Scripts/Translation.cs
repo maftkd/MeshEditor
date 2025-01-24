@@ -243,6 +243,8 @@ public class Translation : MonoBehaviour
                 vertex.position += delta * sign;
             }
             gizmoGO.transform.position += delta * sign;
+            _currentPos = gizmoGO.transform.position;
+            _startPos = _currentPos;
         }
     }
 }
