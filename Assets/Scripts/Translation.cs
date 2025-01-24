@@ -12,7 +12,7 @@ public class Translation : MonoBehaviour
     private Vector3 _startPos;
     private Vector3 _currentPos;
 
-    private bool _translatingViaHotkey;
+    private bool _hotkeyTranslation;
     private Vector3 _offset;
     private Camera _cam;
     private Vector3 _axesConstraints = Vector3.one;
@@ -85,12 +85,13 @@ public class Translation : MonoBehaviour
                 if (ClickPhysics.RaycastMouseToPlaneAtPoint(_startPos, _cam, out Vector3 hitPos))
                 {
                     _offset = hitPos - _startPos;
-                    SetTranslationModeViaHotkey(true);
+                    SetHotkeyTranslation(true);
+                    _currentPos = _startPos;
                 }
             }
         }
         
-        if (_translatingViaHotkey)
+        if (_hotkeyTranslation)
         {
             
             
@@ -157,7 +158,7 @@ public class Translation : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 OnTranslationComplete();
-                SetTranslationModeViaHotkey(false);
+                SetHotkeyTranslation(false);
             }
             
             // rmb to cancel translation
@@ -165,21 +166,27 @@ public class Translation : MonoBehaviour
             {
                 _axesConstraints = Vector3.one;
                 HandleTranslationFromGizmo(_startPos);
-                SetTranslationModeViaHotkey(false);
+                SetHotkeyTranslation(false);
+                gizmoGO.transform.position = _startPos;
             }
             
             
         }
     }
 
-    void SetTranslationModeViaHotkey(bool translationEnabled)
+    void SetHotkeyTranslation(bool translationEnabled)
     {
-        _translatingViaHotkey = translationEnabled;
-        SetGizmoVisibility(!translationEnabled);
+        //toggle state flag
+        _hotkeyTranslation = translationEnabled;
+        
+        //prevent finalization click from getting handled by selection manager
         selectionManager.selectionDisabled = translationEnabled;
-        gizmoGO.transform.position = _currentPos;
-        _startPos = _currentPos;
+        
+        //reset axis constraints - doing this at the beginning and end is a bit redundant, but it works
         _axesConstraints = Vector3.one;
+        
+        //gizmo viz - main gizmo hidden while hotkey translating. Lines hidden at start and end 
+        SetGizmoVisibility(!translationEnabled);
         SetLineGizmoVisibility();
     }
 
@@ -201,6 +208,7 @@ public class Translation : MonoBehaviour
     {
         UndoRedoStack.Instance.Push(new TranslateAction(_currentPos - _startPos));
         _startPos = _currentPos;
+        gizmoGO.transform.position = _currentPos;
     }
 
     void SetGizmoVisibility(bool visible)
@@ -243,8 +251,7 @@ public class Translation : MonoBehaviour
                 vertex.position += delta * sign;
             }
             gizmoGO.transform.position += delta * sign;
-            _currentPos = gizmoGO.transform.position;
-            _startPos = _currentPos;
+            _startPos = gizmoGO.transform.position;
         }
     }
 }
