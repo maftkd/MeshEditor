@@ -10,6 +10,7 @@ public class SelectionManager : MonoBehaviour
     private List<ISelectionPrimitive> _selection = new();
     public List<ISelectionPrimitive> selection => _selection;
     public Action SelectionChanged;
+    public bool selectionDisabled;
     
     public enum SelectionMode
     {
@@ -55,6 +56,11 @@ public class SelectionManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (selectionDisabled)
+        {
+            return;
+        }
+        
         if (Input.GetMouseButtonDown(0))
         {
             Ray ray = _cam.ScreenPointToRay(Input.mousePosition);

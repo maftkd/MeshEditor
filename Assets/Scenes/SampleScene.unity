@@ -359,6 +359,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gizmo: {fileID: 2022688147}
+  lines:
+  - {fileID: 1283999590}
+  - {fileID: 751115991}
+  - {fileID: 718840680}
   selectionManager: {fileID: 1546355039}
 --- !u!4 &540563598
 Transform:
@@ -470,6 +474,16 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &718840680 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4783673065381158399, guid: 239434eacacdb4f8db2c188917386d5c, type: 3}
+  m_PrefabInstance: {fileID: 324031516}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &751115991 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6035114990674618610, guid: 239434eacacdb4f8db2c188917386d5c, type: 3}
+  m_PrefabInstance: {fileID: 324031516}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -554,6 +568,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1283999590 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7706853491431558013, guid: 239434eacacdb4f8db2c188917386d5c, type: 3}
+  m_PrefabInstance: {fileID: 324031516}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1546355038
 GameObject:
   m_ObjectHideFlags: 0
@@ -584,6 +603,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   clickPhysics: {fileID: 145900049}
+  selectionDisabled: 0
   selectionMode: 0
 --- !u!4 &1546355040
 Transform:
