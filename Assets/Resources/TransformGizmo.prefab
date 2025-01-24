@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 3431572605431077845}
   - component: {fileID: 7529951383183206172}
   - component: {fileID: 7961135851059948553}
-  - component: {fileID: 3263430045710279109}
   - component: {fileID: 2743557177294395347}
-  m_Layer: 7
+  - component: {fileID: 3592267359229499386}
+  m_Layer: 0
   m_Name: UpArrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -85,20 +85,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &3263430045710279109
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3388405777304167869}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4019234525060620036, guid: ebeb2b440ae344c038c0e646014f0288, type: 3}
 --- !u!114 &2743557177294395347
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -143,6 +129,20 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   visualGameObject: {fileID: 7706853491431558013}
+--- !u!136 &3592267359229499386
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3388405777304167869}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.17556688
+  m_Height: 0.968725
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.4843625, z: 0}
 --- !u!1 &4783673065381158399
 GameObject:
   m_ObjectHideFlags: 0
@@ -288,7 +288,7 @@ GameObject:
   - component: {fileID: 2632417061757910775}
   - component: {fileID: 286143815656757223}
   - component: {fileID: 3003334036115180666}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: ZYPlane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -562,7 +562,7 @@ GameObject:
   - component: {fileID: 3504506231288416247}
   - component: {fileID: 2766663845271786915}
   - component: {fileID: 5706706196637762664}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: XZPlane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -703,7 +703,7 @@ GameObject:
   - component: {fileID: 961040947706702486}
   - component: {fileID: 286952936830966251}
   - component: {fileID: 4905757356421955420}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -931,7 +931,7 @@ GameObject:
   - component: {fileID: 4261031458844357126}
   - component: {fileID: 7237217362696396568}
   - component: {fileID: 8978566936550058702}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: TransformGizmo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -999,9 +999,9 @@ GameObject:
   - component: {fileID: 476337196596443588}
   - component: {fileID: 7302869343454183161}
   - component: {fileID: 2703534089927712003}
-  - component: {fileID: 807851583849877012}
   - component: {fileID: 3232954323913479520}
-  m_Layer: 7
+  - component: {fileID: 1772376186490216709}
+  m_Layer: 0
   m_Name: ForwardArrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1073,20 +1073,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &807851583849877012
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8728289216208976473}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4019234525060620036, guid: ebeb2b440ae344c038c0e646014f0288, type: 3}
 --- !u!114 &3232954323913479520
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1131,6 +1117,20 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   visualGameObject: {fileID: 4783673065381158399}
+--- !u!136 &1772376186490216709
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8728289216208976473}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.17556688
+  m_Height: 0.968725
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.4843625, z: 0}
 --- !u!1 &8853984481754079786
 GameObject:
   m_ObjectHideFlags: 0
@@ -1144,7 +1144,7 @@ GameObject:
   - component: {fileID: 9003788972637475274}
   - component: {fileID: 4968184000615297654}
   - component: {fileID: 4126973143885139072}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: XYPlane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1284,9 +1284,9 @@ GameObject:
   - component: {fileID: 3598558222497393136}
   - component: {fileID: 5951328555489881703}
   - component: {fileID: 2302899661971683885}
-  - component: {fileID: 3921966522460402328}
   - component: {fileID: 3157440025602097504}
-  m_Layer: 7
+  - component: {fileID: 2473644851803529205}
+  m_Layer: 0
   m_Name: RightArrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1358,20 +1358,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &3921966522460402328
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9038886430418369444}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4019234525060620036, guid: ebeb2b440ae344c038c0e646014f0288, type: 3}
 --- !u!114 &3157440025602097504
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1416,3 +1402,17 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   visualGameObject: {fileID: 6035114990674618610}
+--- !u!136 &2473644851803529205
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9038886430418369444}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.17556693
+  m_Height: 0.96872526
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.48436263, z: 0}

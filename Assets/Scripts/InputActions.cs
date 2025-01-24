@@ -1,3 +1,4 @@
+using UnityEngine;
 using System.Collections.Generic;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
 
@@ -18,5 +19,15 @@ public class SelectAction : IInputAction
     {
         this.prevSelection = new List<ISelectionPrimitive>(prevSelection);
         this.newSelection = new List<ISelectionPrimitive>(newSelection);
+    }
+}
+
+public class TranslateAction : IInputAction
+{
+    public Vector3 delta;
+
+    public TranslateAction(Vector3 delta)
+    {
+        this.delta = delta;
     }
 }

@@ -7,7 +7,8 @@ public class SelectionManager : MonoBehaviour
 {
     private Camera _cam;
     public ClickPhysics clickPhysics;
-    public List<ISelectionPrimitive> _selection = new();
+    private List<ISelectionPrimitive> _selection = new();
+    public List<ISelectionPrimitive> selection => _selection;
     public Action SelectionChanged;
     
     public enum SelectionMode
@@ -40,14 +41,14 @@ public class SelectionManager : MonoBehaviour
     void Start()
     {
         _cam = Camera.main;
-        UndoRedoStack.Instance.UndoRedo += HandleUndoRedo;
+        UndoRedoStack.Instance.UndoRedo += OnUndoRedo;
     }
 
     private void OnDestroy()
     {
         if (UndoRedoStack.Instance != null)
         {
-            UndoRedoStack.Instance.UndoRedo -= HandleUndoRedo;
+            UndoRedoStack.Instance.UndoRedo -= OnUndoRedo;
         }
     }
 
@@ -109,11 +110,11 @@ public class SelectionManager : MonoBehaviour
         _selection.Clear();
     }
     
-    void HandleUndoRedo(IInputAction action, bool isUndo)
+    void OnUndoRedo(IInputAction action, bool wasUndo)
     {
         if (action is SelectAction selectAction)
         {
-            if (isUndo)
+            if (wasUndo)
             {
                 foreach (ISelectionPrimitive prim in selectAction.newSelection)
                 {
