@@ -59,6 +59,20 @@ public class ClickPhysics : MonoBehaviour
         return closestVertex;
     }
     
+    public static bool RaycastMouseToPlaneAtPoint(Vector3 point, Camera cam, out Vector3 hit)
+    {
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        Plane plane = new Plane(cam.transform.forward, point);
+        if (plane.Raycast(ray, out float distance))
+        {
+            hit = ray.GetPoint(distance);
+            return true;
+        }
+
+        hit = Vector3.zero;
+        return false;
+    }
+    
     // sphere of size ra centered at point ce
     // from https://iquilezles.org/articles/intersectors/
     Vector2 SphIntersect(Vector3 ro,Vector3 rd, Vector3 ce, float ra )

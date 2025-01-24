@@ -16,6 +16,9 @@ public class Translation : MonoBehaviour
     private Vector3 _offset;
     private Camera _cam;
     
+    //using the gizmo as a hint that the selection is ready to be translated, since its updated on selection change
+    private bool _selectionReadyToTranslate => gizmoGO.activeSelf;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -41,6 +44,7 @@ public class Translation : MonoBehaviour
         }
     }
 
+    // position the gizmo and set visibility based on selection
     void OnSelectionChanged()
     {
         if (selectionManager.selection.Count == 0)
@@ -71,47 +75,41 @@ public class Translation : MonoBehaviour
 
     void Update()
     {
+        //this is like Blender's translate with the "G" key
         if (_translatingViaHotkey)
         {
-            Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
-            Plane plane = new Plane(_cam.transform.forward, _startPos);
-            if (plane.Raycast(ray, out float enter))
+            // Determine where mouse ray falls on translation plane
+            if(ClickPhysics.RaycastMouseToPlaneAtPoint(_currentPos, _cam, out Vector3 hitPos))
             {
-                Vector3 hitPos = ray.GetPoint(enter);
-                //_currentPos = hitPos - _offset;
                 HandleTranslationFromGizmo(hitPos - _offset);
                 gizmoGO.transform.position = _currentPos;
             }
 
+            // lmb to Confirm translation
             if (Input.GetMouseButtonDown(0))
             {
                 OnTranslationComplete();
                 SetTranslationModeViaHotkey(false);
             }
+            
+            // rmb to cancel translation
             else if (Input.GetMouseButtonDown(1))
             {
-                Vector3 delta = _startPos - _currentPos;
-                foreach (ISelectionPrimitive prim in selectionManager.selection)
-                {
-                    SelectionManager.Vertex vertex = (SelectionManager.Vertex) prim;
-                    vertex.position += delta;
-                }
-                _currentPos = _startPos;
+                HandleTranslationFromGizmo(_startPos);
                 SetTranslationModeViaHotkey(false);
             }
         }
-        if (gizmoGO.activeSelf)
+        
+        // If we have an active selection, listen for G hotkey as an alternate form of translation
+        if (_selectionReadyToTranslate)
         {
             if (Input.GetKeyDown(KeyCode.G))
             {
-                Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
-                Plane plane = new Plane(_cam.transform.forward, _startPos);
-                if (plane.Raycast(ray, out float enter))
+                if (ClickPhysics.RaycastMouseToPlaneAtPoint(_startPos, _cam, out Vector3 hitPos))
                 {
-                    Vector3 hitPos = ray.GetPoint(enter);
                     _offset = hitPos - _startPos;
+                    SetTranslationModeViaHotkey(true);
                 }
-                SetTranslationModeViaHotkey(true);
             }
         }
     }
@@ -122,6 +120,7 @@ public class Translation : MonoBehaviour
         SetGizmoVisibility(!translationEnabled);
         selectionManager.selectionDisabled = translationEnabled;
         gizmoGO.transform.position = _currentPos;
+        _startPos = _currentPos;
     }
 
     void HandleTranslationFromGizmo(Vector3 pos)
