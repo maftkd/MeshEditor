@@ -5,7 +5,8 @@ using UnityEngine;
 
 public class TransformGizmo : MonoBehaviour
 {
-    public Action<Vector3> OnTranslated;
+    public Action<Vector3> Translated;
+    public Action TranslationComplete;
     // Start is called before the first frame update
     void Start()
     {
@@ -20,6 +21,12 @@ public class TransformGizmo : MonoBehaviour
 
     public void Translate(Vector3 newPos)
     {
-        OnTranslated?.Invoke(newPos);
+        Translated?.Invoke(newPos);
+    }
+
+    public void DoneTranslating()
+    {
+        TranslationComplete?.Invoke();
+        
     }
 }

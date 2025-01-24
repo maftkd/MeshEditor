@@ -219,18 +219,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4783673065381158399, guid: 239434eacacdb4f8db2c188917386d5c, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6035114990674618610, guid: 239434eacacdb4f8db2c188917386d5c, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7706853491431558013, guid: 239434eacacdb4f8db2c188917386d5c, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 8050071277575068452, guid: 239434eacacdb4f8db2c188917386d5c, type: 3}
       propertyPath: m_Name
       value: TransformGizmo

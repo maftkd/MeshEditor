@@ -127,6 +127,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  OnDragComplete:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7237217362696396568}
+        m_TargetAssemblyTypeName: TransformGizmo, Assembly-CSharp
+        m_MethodName: DoneTranslating
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   visualGameObject: {fileID: 7706853491431558013}
 --- !u!1 &4783673065381158399
 GameObject:
@@ -144,7 +159,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3168601173834645116
 Transform:
   m_ObjectHideFlags: 0
@@ -386,6 +401,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  OnDragComplete:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7237217362696396568}
+        m_TargetAssemblyTypeName: TransformGizmo, Assembly-CSharp
+        m_MethodName: DoneTranslating
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   visualGameObject: {fileID: 0}
 --- !u!1 &6035114990674618610
 GameObject:
@@ -403,7 +433,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2896126107684626906
 Transform:
   m_ObjectHideFlags: 0
@@ -645,6 +675,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  OnDragComplete:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7237217362696396568}
+        m_TargetAssemblyTypeName: TransformGizmo, Assembly-CSharp
+        m_MethodName: DoneTranslating
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   visualGameObject: {fileID: 0}
 --- !u!1 &7098583406624074352
 GameObject:
@@ -759,7 +804,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &388172693133303406
 Transform:
   m_ObjectHideFlags: 0
@@ -1070,6 +1115,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  OnDragComplete:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7237217362696396568}
+        m_TargetAssemblyTypeName: TransformGizmo, Assembly-CSharp
+        m_MethodName: DoneTranslating
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   visualGameObject: {fileID: 4783673065381158399}
 --- !u!1 &8853984481754079786
 GameObject:
@@ -1189,6 +1249,21 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: TransformGizmo, Assembly-CSharp
         m_MethodName: Translate
         m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnDragComplete:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7237217362696396568}
+        m_TargetAssemblyTypeName: TransformGizmo, Assembly-CSharp
+        m_MethodName: DoneTranslating
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1317,6 +1392,21 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: TransformGizmo, Assembly-CSharp
         m_MethodName: Translate
         m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnDragComplete:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7237217362696396568}
+        m_TargetAssemblyTypeName: TransformGizmo, Assembly-CSharp
+        m_MethodName: DoneTranslating
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

@@ -13,13 +13,15 @@ public class Translation : MonoBehaviour
         gizmoGO = gizmo.gameObject;
         gizmoGO.gameObject.SetActive(false);
         selectionManager.SelectionChanged += OnSelectionChanged;
-        gizmo.OnTranslated += HandleTranslationFromGizmo;
+        gizmo.Translated += HandleTranslationFromGizmo;
+        gizmo.TranslationComplete += OnTranslationComplete;
     }
 
     private void OnDestroy()
     {
         selectionManager.SelectionChanged -= OnSelectionChanged;
-        gizmo.OnTranslated -= HandleTranslationFromGizmo;
+        gizmo.Translated -= HandleTranslationFromGizmo;
+        gizmo.TranslationComplete -= OnTranslationComplete;
     }
 
     void OnSelectionChanged()
@@ -50,6 +52,10 @@ public class Translation : MonoBehaviour
     void HandleTranslationFromGizmo(Vector3 pos)
     {
         Debug.Log("Translated: " + pos);
-        
+    }
+    
+    void OnTranslationComplete()
+    {
+        Debug.Log("Translation Complete");
     }
 }

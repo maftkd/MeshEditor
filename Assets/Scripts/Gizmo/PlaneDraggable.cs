@@ -9,6 +9,7 @@ public class PlaneDraggable : MonoBehaviour
     private Camera mainCam;
 
     public UnityEvent<Vector3> OnDrag;
+    public UnityEvent OnDragComplete;
 
     public GameObject visualGameObject;
 
@@ -40,6 +41,7 @@ public class PlaneDraggable : MonoBehaviour
                 {
                     visualGameObject.SetActive(false);
                 }
+                OnDragComplete?.Invoke();
             }
         }
     }
