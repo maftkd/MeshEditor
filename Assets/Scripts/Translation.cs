@@ -86,7 +86,6 @@ public class Translation : MonoBehaviour
                 {
                     _offset = hitPos - _startPos;
                     SetHotkeyTranslation(true);
-                    _currentPos = _startPos;
                 }
             }
         }
@@ -252,6 +251,7 @@ public class Translation : MonoBehaviour
             }
             gizmoGO.transform.position += delta * sign;
             _startPos = gizmoGO.transform.position;
+            _currentPos = _startPos;
         }
     }
 }
