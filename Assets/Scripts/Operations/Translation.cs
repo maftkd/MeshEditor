@@ -1,5 +1,6 @@
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
 
 public class Translation : MonoBehaviour
@@ -16,6 +17,8 @@ public class Translation : MonoBehaviour
     private Vector3 _offset;
     private Camera _cam;
     private Vector3 _axesConstraints = Vector3.one;
+    private bool _wasDuplicate;
+    public UnityEvent<bool> OnHotkeyTranslate;
     
     //using the gizmo as a hint that the selection is ready to be translated, since its updated on selection change
     private bool _selectionReadyToTranslate => gizmoGO.activeSelf;
@@ -82,7 +85,7 @@ public class Translation : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.G))
             {
-                HotkeyTranslate();
+                HotkeyTranslate(false);
             }
         }
         
@@ -161,6 +164,9 @@ public class Translation : MonoBehaviour
             {
                 _axesConstraints = Vector3.one;
                 HandleTranslationFromGizmo(_startPos);
+                
+                OnHotkeyTranslate?.Invoke(_wasDuplicate);
+                
                 SetHotkeyTranslation(false);
                 gizmoGO.transform.position = _startPos;
             }
@@ -169,16 +175,16 @@ public class Translation : MonoBehaviour
         }
     }
 
-    public void HotkeyTranslate()
+    public void HotkeyTranslate(bool wasDuplicate)
     {
         if (ClickPhysics.RaycastMouseToPlaneAtPoint(_startPos, _cam, out Vector3 hitPos))
         {
             _offset = hitPos - _startPos;
-            SetHotkeyTranslation(true);
+            SetHotkeyTranslation(true, wasDuplicate);
         }
     }
 
-    public void SetHotkeyTranslation(bool translationEnabled)
+    public void SetHotkeyTranslation(bool translationEnabled, bool wasDuplicate = false)
     {
         //toggle state flag
         _hotkeyTranslation = translationEnabled;
@@ -188,6 +194,9 @@ public class Translation : MonoBehaviour
         
         //reset axis constraints - doing this at the beginning and end is a bit redundant, but it works
         _axesConstraints = Vector3.one;
+        
+        //lets us know how to store this action in the undo stack.
+        _wasDuplicate = wasDuplicate;
         
         //gizmo viz - main gizmo hidden while hotkey translating. Lines hidden at start and end 
         SetGizmoVisibility(!translationEnabled);
@@ -210,7 +219,17 @@ public class Translation : MonoBehaviour
     
     void OnTranslationComplete()
     {
-        UndoRedoStack.Instance.Push(new TranslateAction(_currentPos - _startPos));
+        if (_wasDuplicate)
+        {
+            //UndoRedoStack.Instance.Push(new DuplicateAction());
+            
+        }
+        else
+        {
+            UndoRedoStack.Instance.Push(new TranslateAction(_currentPos - _startPos));
+        }
+        OnHotkeyTranslate?.Invoke(_wasDuplicate);
+        
         _startPos = _currentPos;
         gizmoGO.transform.position = _currentPos;
     }

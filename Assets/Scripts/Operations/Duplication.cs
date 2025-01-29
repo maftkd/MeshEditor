@@ -10,6 +10,8 @@ public class Duplication : MonoBehaviour
     public SelectionManager selectionManager;
     public MyMesh myMesh;
     public UnityEvent OnDuplicate;
+    private List<ISelectionPrimitive> _previousSelection = new();
+    private List<ISelectionPrimitive> _duplicatedPrimitives = new();
     // Start is called before the first frame update
     void Start()
     {
@@ -30,18 +32,28 @@ public class Duplication : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.D) && (Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.LeftControl) 
                                                                              || Input.GetKey(KeyCode.LeftShift)))
         {
-            List<ISelectionPrimitive> duplicatedPrimitives = new List<ISelectionPrimitive>();
-            List<ISelectionPrimitive> previousSelection = new List<ISelectionPrimitive>(selectionManager.selection);
+            _duplicatedPrimitives = new List<ISelectionPrimitive>();
+            _previousSelection = new List<ISelectionPrimitive>(selectionManager.selection);
             for (int i = selectionManager.selection.Count - 1; i >= 0; i--)
             {
                 ISelectionPrimitive prim = selectionManager.selection[i].Copy();
-                duplicatedPrimitives.Add(prim);
+                _duplicatedPrimitives.Add(prim);
                 myMesh.vertices.Add((SelectionManager.Vertex)prim);
             }
-            selectionManager.SetSelection(duplicatedPrimitives);
+            selectionManager.SetSelection(_duplicatedPrimitives);
             //UndoRedoStack.Instance.Push(new DuplicateAction(duplicatedPrimitives, previousSelection));
             OnDuplicate?.Invoke();
         }
+    }
+
+    public void DuplicationTranslationComplete(bool wasDuplicate)
+    {
+        if (!wasDuplicate)
+        {
+            return;
+        }
+        
+        UndoRedoStack.Instance.Push(new DuplicateAction(_duplicatedPrimitives, _previousSelection));
     }
     
     void OnUndoRedo(IInputAction action, bool isUndo)
