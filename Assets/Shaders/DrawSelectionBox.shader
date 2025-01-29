@@ -58,8 +58,13 @@ Shader "Hidden/DrawSelectionBox"
                 float y1Dist = abs(i.vertex.y - _Box.y);
                 float y2Dist = abs(i.vertex.y - _Box.w);
                 float xDist = min(x1Dist, x2Dist);
+                float dashed = i.vertex.y % 10 > 5 ? 1 : 0;
+                xDist *= lerp(1, 1000, dashed);
                 float yDist = min(y1Dist, y2Dist);
+                dashed = i.vertex.x % 10 > 5 ? 1 : 0;
+                yDist *= lerp(1, 1000, dashed);
                 float dist = min(xDist, yDist);
+
                 col = lerp(col, fixed4(0, 1, 0, 1), smoothstep(weight, 0, dist));
                 return col;
             }
