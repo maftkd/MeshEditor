@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using SelectionMode = SelectionManager.SelectionMode;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
@@ -84,5 +87,34 @@ public class ClickPhysics : MonoBehaviour
         if( h<0.0 ) return new Vector2(-1.0f, -1.0f); // no intersection
         h = Mathf.Sqrt( h );
         return new Vector2( -b-h, -b+h );
+    }
+
+    //box xy is min, zw is max, all in normalized 0 to 1 space
+    public List<ISelectionPrimitive> FrustumOverlap(Vector4 boxCoords)
+    {
+        List<ISelectionPrimitive> selection = new();
+        foreach (Vertex v in mesh.vertices)
+        {
+            float xMin = Mathf.Lerp(-1f, 1f, boxCoords.x);
+            float xMax = Mathf.Lerp(-1f, 1f, boxCoords.z);
+            float yMin = Mathf.Lerp(-1f, 1f, boxCoords.y);
+            float yMax = Mathf.Lerp(-1f, 1f, boxCoords.w);
+            Vector4 viewPos = _cam.worldToCameraMatrix * new Vector4(v.position.x, v.position.y, v.position.z, 1.0f);
+            if(-viewPos.z < _cam.nearClipPlane || -viewPos.z > _cam.farClipPlane)
+            {
+                continue;
+            }
+            Vector4 clipPos = _cam.projectionMatrix * viewPos;
+            clipPos /= clipPos.w;
+            if (clipPos.x < xMin || clipPos.x > xMax || clipPos.y < yMin || clipPos.y > yMax)
+            {
+                continue;
+            }
+            //Debug.Log("clip pos: " + clipPos / clipPos.w);
+            selection.Add(v);
+        }
+
+        //Debug.Log("selection count: " + selection.Count);
+        return selection;
     }
 }

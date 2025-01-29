@@ -116,11 +116,30 @@ public class SelectionManager : MonoBehaviour
             _boxEnd = Input.mousePosition;
             float boxMinX = Mathf.Min(_boxStart.x, _boxEnd.x);
             float boxMaxX = Mathf.Max(_boxStart.x, _boxEnd.x);
+            float boxMinY = Mathf.Min(_boxStart.y, _boxEnd.y);
+            float boxMaxY = Mathf.Max(_boxStart.y, _boxEnd.y);
             //note y max, min are swapped to match the gpu's frag coords
-            float boxMinY = Mathf.Max(_boxStart.y, _boxEnd.y);
-            float boxMaxY = Mathf.Min(_boxStart.y, _boxEnd.y);
-            Shader.SetGlobalVector("_Box", new Vector4(boxMinX, Screen.height - boxMinY, 
-                boxMaxX, Screen.height - boxMaxY));
+            Shader.SetGlobalVector("_Box", new Vector4(boxMinX, Screen.height - boxMaxY, 
+                boxMaxX, Screen.height - boxMinY));
+            
+            Vector4 selectionBox = new Vector4(boxMinX / Screen.width, boxMinY / Screen.height, 
+                boxMaxX / Screen.width, boxMaxY / Screen.height);
+            List<ISelectionPrimitive> newSelection = clickPhysics.FrustumOverlap(selectionBox);
+            foreach(ISelectionPrimitive prim in newSelection)
+            {
+                if (!_selection.Contains(prim))
+                {
+                    Select(prim);
+                }
+            }
+
+            for (int i = _selection.Count - 1; i >= 0; i--)
+            {
+                if (!newSelection.Contains(_selection[i]))
+                {
+                    Deselect(_selection[i]);
+                }
+            }
         }
         else if (Input.GetMouseButtonUp(0))
         {
