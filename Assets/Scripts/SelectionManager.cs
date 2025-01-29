@@ -137,9 +137,15 @@ public class SelectionManager : MonoBehaviour
             {
                 if (!newSelection.Contains(_selection[i]))
                 {
+                    if(Input.GetKey(KeyCode.LeftShift) && _prevSelection.Contains(_selection[i]))
+                    {
+                        //don't deselect if it was part of the previous selection
+                        continue;
+                    }
                     Deselect(_selection[i]);
                 }
             }
+            SelectionChanged?.Invoke();
         }
         else if (Input.GetMouseButtonUp(0))
         {
