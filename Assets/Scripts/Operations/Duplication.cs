@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
+using Vertex = SelectionManager.Vertex;
+using Edge = SelectionManager.Edge;
 
 public class Duplication : MonoBehaviour
 {
@@ -34,14 +36,46 @@ public class Duplication : MonoBehaviour
         {
             _duplicatedPrimitives = new List<ISelectionPrimitive>();
             _previousSelection = new List<ISelectionPrimitive>(selectionManager.selection);
-            for (int i = selectionManager.selection.Count - 1; i >= 0; i--)
+            
+            //first go through higher-order prims
+            foreach (ISelectionPrimitive prim in selectionManager.selection)
             {
-                ISelectionPrimitive prim = selectionManager.selection[i].Copy();
-                _duplicatedPrimitives.Add(prim);
-                myMesh.vertices.Add((SelectionManager.Vertex)prim);
+                if (prim is Edge e)
+                {
+                    Vertex newA = (Vertex)e.a.Copy();
+                    Vertex newB = (Vertex)e.b.Copy();
+                    Edge newEdge = new Edge(newA, newB);
+                    _duplicatedPrimitives.Add(newEdge);
+                    _duplicatedPrimitives.Add(newA);
+                    _duplicatedPrimitives.Add(newB);
+                }
             }
+            // then lower order
+            foreach(ISelectionPrimitive prim in selectionManager.selection)
+            {
+                if (prim is Vertex v)
+                {
+                    Vertex newV = (Vertex)v.Copy();
+                    _duplicatedPrimitives.Add(newV);
+                }
+            }
+
+            foreach (ISelectionPrimitive prim in _duplicatedPrimitives)
+            {
+                switch (prim)
+                {
+                    case Vertex v:
+                        myMesh.vertices.Add(v);
+                        break;
+                    case Edge e:
+                        myMesh.edges.Add(e);
+                        break;
+                }
+            }
+            
             selectionManager.SetSelection(_duplicatedPrimitives);
-            //UndoRedoStack.Instance.Push(new DuplicateAction(duplicatedPrimitives, previousSelection));
+            
+            //note this event triggers translation, which in turn triggers undo/redo
             OnDuplicate?.Invoke();
         }
     }
@@ -64,7 +98,15 @@ public class Duplication : MonoBehaviour
             {
                 foreach (var primitive in duplicateAction.duplicatedPrimitives)
                 {
-                    myMesh.vertices.Remove((SelectionManager.Vertex)primitive);
+                    switch (primitive)
+                    {
+                        case Vertex v:
+                            myMesh.vertices.Remove(v);
+                            break;
+                        case Edge e:
+                            myMesh.edges.Remove(e);
+                            break;
+                    }
                 }
                 selectionManager.SetSelection(duplicateAction.previousSelection);
             }
@@ -72,7 +114,15 @@ public class Duplication : MonoBehaviour
             {
                 foreach (var primitive in duplicateAction.duplicatedPrimitives)
                 {
-                    myMesh.vertices.Add((SelectionManager.Vertex)primitive);
+                    switch (primitive)
+                    {
+                        case Vertex v:
+                            myMesh.vertices.Add(v);
+                            break;
+                        case Edge e:
+                            myMesh.edges.Add(e);
+                            break;
+                    }
                 }
                 selectionManager.SetSelection(duplicateAction.duplicatedPrimitives);
             }
