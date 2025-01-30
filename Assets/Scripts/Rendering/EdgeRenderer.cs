@@ -26,7 +26,7 @@ public class EdgeRenderer : MonoBehaviour
         GL.Begin(GL.LINES);
         foreach (Edge e in mesh.edges)
         {
-            if (e.a.selected && e.b.selected)
+            if (e.selected)
             {
                 GL.Color(Color.green);
             }

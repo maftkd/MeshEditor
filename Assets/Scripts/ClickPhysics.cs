@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using SelectionMode = SelectionManager.SelectionMode;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
 using Vertex = SelectionManager.Vertex;
+using Edge = SelectionManager.Edge;
 
 public class ClickPhysics : MonoBehaviour
 {
@@ -24,6 +23,8 @@ public class ClickPhysics : MonoBehaviour
         {
             case SelectionMode.Vertex:
                 return RaycastVertices(ray);
+            case SelectionMode.Edge:
+                return RaycastEdges(ray);
             default:
                 return null;
         }
@@ -61,6 +62,39 @@ public class ClickPhysics : MonoBehaviour
 
         return closestVertex;
     }
+    private Edge RaycastEdges(Ray ray)
+    {
+        float minT = float.MaxValue;
+        Edge closestEdge = null;
+        
+        foreach (Edge e in mesh.edges)
+        {
+            Vector3 center = (e.a.position + e.b.position) / 2;
+            //this plane raycast is dual purpose
+            //1) it confirms that the sphere is in front of the camera
+            //2) it gives us the z-distance of the vertex in view space
+            Plane plane = new Plane(_cam.transform.forward, center);
+            Ray camForwardRay = new Ray(_cam.transform.position, _cam.transform.forward);
+            if (plane.Raycast(camForwardRay, out float distance))
+            {
+                //use z-dist to scale the radius such that all vertices have equal size on screen
+                float width = Mathf.Tan(_cam.fieldOfView * Mathf.Deg2Rad) * distance;
+                float radius = width * vertexWidthPercentage;
+                
+                float hit = CapIntersect(ray.origin, ray.direction, e.a.position, e.b.position, radius);
+                if (hit > 0.0)
+                {
+                    if(hit < minT)
+                    {
+                        minT = hit;
+                        closestEdge = e;
+                    }
+                }
+            }
+        }
+
+        return closestEdge;
+    }
     
     public static bool RaycastMouseToPlaneAtPoint(Vector3 point, Camera cam, out Vector3 hit)
     {
@@ -76,18 +110,6 @@ public class ClickPhysics : MonoBehaviour
         return false;
     }
     
-    // sphere of size ra centered at point ce
-    // from https://iquilezles.org/articles/intersectors/
-    Vector2 SphIntersect(Vector3 ro,Vector3 rd, Vector3 ce, float ra )
-    {
-        Vector3 oc = ro - ce;
-        float b = Vector3.Dot( oc, rd );
-        float c = Vector3.Dot( oc, oc ) - ra*ra;
-        float h = b*b - c;
-        if( h<0.0 ) return new Vector2(-1.0f, -1.0f); // no intersection
-        h = Mathf.Sqrt( h );
-        return new Vector2( -b-h, -b+h );
-    }
 
     //box xy is min, zw is max, all in normalized 0 to 1 space
     public List<ISelectionPrimitive> FrustumOverlap(Vector4 boxCoords)
@@ -110,11 +132,50 @@ public class ClickPhysics : MonoBehaviour
             {
                 continue;
             }
-            //Debug.Log("clip pos: " + clipPos / clipPos.w);
             selection.Add(v);
         }
 
-        //Debug.Log("selection count: " + selection.Count);
         return selection;
+    }
+    
+    // sphere of size ra centered at point ce
+    // from https://iquilezles.org/articles/intersectors/
+    Vector2 SphIntersect(Vector3 ro,Vector3 rd, Vector3 ce, float ra )
+    {
+        Vector3 oc = ro - ce;
+        float b = Vector3.Dot( oc, rd );
+        float c = Vector3.Dot( oc, oc ) - ra*ra;
+        float h = b*b - c;
+        if( h<0.0 ) return new Vector2(-1.0f, -1.0f); // no intersection
+        h = Mathf.Sqrt( h );
+        return new Vector2( -b-h, -b+h );
+    }
+    float CapIntersect( in Vector3 ro, in Vector3 rd, in Vector3 pa, in Vector3 pb, in float ra )
+    {
+        Vector3  ba = pb - pa;
+        Vector3  oa = ro - pa;
+        float baba = Vector3.Dot(ba,ba);
+        float bard = Vector3.Dot(ba,rd);
+        float baoa = Vector3.Dot(ba,oa);
+        float rdoa = Vector3.Dot(rd,oa);
+        float oaoa = Vector3.Dot(oa,oa);
+        float a = baba      - bard*bard;
+        float b = baba*rdoa - baoa*bard;
+        float c = baba*oaoa - baoa*baoa - ra*ra*baba;
+        float h = b*b - a*c;
+        if( h >= 0.0 )
+        {
+            float t = (-b-Mathf.Sqrt(h))/a;
+            float y = baoa + t*bard;
+            // body
+            if( y>0.0 && y<baba ) return t;
+            // caps
+            Vector3 oc = (y <= 0.0) ? oa : ro - pb;
+            b = Vector3.Dot(rd,oc);
+            c = Vector3.Dot(oc,oc) - ra*ra;
+            h = b*b - c;
+            if( h>0.0 ) return -b - Mathf.Sqrt(h);
+        }
+        return -1.0f;
     }
 }
