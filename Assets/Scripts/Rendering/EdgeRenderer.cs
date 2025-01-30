@@ -1,11 +1,14 @@
 using UnityEngine;
 using Edge = SelectionManager.Edge;
+using SelectionMode = SelectionManager.SelectionMode;
 
 public class EdgeRenderer : MonoBehaviour
 {
     public Shader shader;
     private Material _mat;
     public MyMesh mesh;
+
+    public SelectionManager selectionManager;
     // Start is called before the first frame update
     void Start()
     {
@@ -36,10 +39,20 @@ public class EdgeRenderer : MonoBehaviour
                 GL.Color(Color.black);
             }
             */
-            GL.Color(e.a.selected ? Color.green : Color.black);
-            GL.Vertex(e.a.position);
-            GL.Color(e.b.selected ? Color.green : Color.black);
-            GL.Vertex(e.b.position);
+            switch (selectionManager.selectionMode)
+            {
+                case SelectionMode.Vertex:
+                    GL.Color(e.a.selected ? Color.green : Color.black);
+                    GL.Vertex(e.a.position);
+                    GL.Color(e.b.selected ? Color.green : Color.black);
+                    GL.Vertex(e.b.position);
+                    break;
+                default:
+                    GL.Color(e.selected ? Color.green : Color.black);
+                    GL.Vertex(e.a.position);
+                    GL.Vertex(e.b.position);
+                    break;
+            }
         }
         GL.End();
         
