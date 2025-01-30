@@ -69,7 +69,7 @@ Shader "Unlit/MyVertex"
                 bool selected = UNITY_ACCESS_INSTANCED_PROP(Props, _Selected);
                 if(selected)
                 {
-                    col.rgb = lerp(float3(1,1,1), float3(1,1,0), smoothstep(0.35, 0.25, dist));
+                    col.rgb = lerp(float3(1,1,1), float3(0,1,0), smoothstep(0.35, 0.25, dist));
                 }
                 col.a = smoothstep(0.5, 0.4, dist);
                 return col;
