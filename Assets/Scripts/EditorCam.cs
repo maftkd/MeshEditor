@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -17,6 +18,20 @@ public class EditorCam : MonoBehaviour
     void Update()
     {
         selectionManager.selectionDisabledViaCamera = false;
+
+        //frame selected
+        if (Input.GetKeyDown(KeyCode.Period))
+        {
+            if (selectionManager.GetSelectionCenterAndBounds(out Vector3 center, out Bounds bounds))
+            {
+                float maxBounds = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
+                StopAllCoroutines();
+                StartCoroutine(MoveToNewFocusPoint(center, maxBounds));
+            }
+
+            return;
+        }
+        
         if (Input.GetKey(KeyCode.LeftShift))
         {
             selectionManager.selectionDisabledViaCamera = true;
@@ -81,5 +96,21 @@ public class EditorCam : MonoBehaviour
                 radius * Mathf.Sin(phi), radius * Mathf.Cos(phi) * Mathf.Sin(theta));
             transform.LookAt(_focusPoint);
         }
+    }
+
+    IEnumerator MoveToNewFocusPoint(Vector3 newPoint, float maxBounds)
+    {
+        Vector3 targetPos = newPoint - transform.forward * (maxBounds * 2f);
+        Vector3 startPos = transform.position;
+        _focusPoint = newPoint;
+        float duration = 0.3f;
+        float timer = 0f;
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            transform.position = Vector3.Lerp(startPos, targetPos, timer / duration);
+            yield return null;
+        }
+        transform.position = targetPos;
     }
 }

@@ -472,6 +472,31 @@ public class SelectionManager : MonoBehaviour
         //ClearSelection();
     }
 
+    public bool GetSelectionCenterAndBounds(out Vector3 center, out Bounds bounds)
+    {
+        center = Vector3.zero;
+        bounds = new Bounds();
+        int count = 0;
+        foreach (ISelectionPrimitive prim in selection)
+        {
+            if (prim is Vertex v)
+            {
+                center += v.position;
+                bounds.Encapsulate(v.position);
+                count++;
+            }
+        }
+
+        if (count == 0)
+        {
+            return false;
+        }
+
+        center /= count;
+        return true;
+    }
+
+    //Debuging*******************************************************************************************************
     [ContextMenu("Debug Selection")]
     public void DebugSelection()
     {
