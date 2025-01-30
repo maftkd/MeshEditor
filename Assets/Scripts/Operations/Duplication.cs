@@ -53,7 +53,7 @@ public class Duplication : MonoBehaviour
             // then lower order
             foreach(ISelectionPrimitive prim in selectionManager.selection)
             {
-                if (prim is Vertex v)
+                if (prim is Vertex v && !_duplicatedPrimitives.Contains(prim))
                 {
                     Vertex newV = (Vertex)v.Copy();
                     _duplicatedPrimitives.Add(newV);
