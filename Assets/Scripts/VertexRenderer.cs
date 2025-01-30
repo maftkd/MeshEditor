@@ -7,7 +7,7 @@ using SelectionMode = SelectionManager.SelectionMode;
 /// It is primarily a visualization of the "selection" primitives that the user can manipulate to form the model
 /// The GL mesh, fbx/obj, whatever will be generated from this data
 /// </summary>
-public class MyMeshRenderer : MonoBehaviour
+public class VertexRenderer : MonoBehaviour
 {
     public Shader myVertexShader;
     private Material _mat;
