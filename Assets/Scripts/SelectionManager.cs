@@ -48,6 +48,24 @@ public class SelectionManager : MonoBehaviour
         }
     }
     
+    public class Edge : ISelectionPrimitive
+    {
+        public Vertex a;
+        public Vertex b;
+        public bool selected { get; set; }
+
+        public Edge(Vertex a, Vertex b)
+        {
+            this.a = a;
+            this.b = b;
+        }
+        
+        public ISelectionPrimitive Copy()
+        {
+            return new Edge(a, b);
+        }
+    }
+    
     public SelectionMode selectionMode = SelectionMode.Vertex;
     
     // Start is called before the first frame update
