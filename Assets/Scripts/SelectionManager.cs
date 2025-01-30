@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class SelectionManager : MonoBehaviour
@@ -15,6 +16,7 @@ public class SelectionManager : MonoBehaviour
     public List<ISelectionPrimitive> selection => _selection;
     public Action SelectionChanged;
     public bool selectionDisabled;
+    public TextMeshProUGUI modeText;
     
     private Vector3 _boxStart;
     private Vector3 _boxEnd;
@@ -73,6 +75,7 @@ public class SelectionManager : MonoBehaviour
     void Start()
     {
         _cam = Camera.main;
+        ChangeMode(SelectionMode.Vertex);
         UndoRedoStack.Instance.UndoRedo += OnUndoRedo;
         Shader.SetGlobalVector("_Box", Vector4.zero);
     }
@@ -88,6 +91,25 @@ public class SelectionManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        SelectionMode newMode = selectionMode;
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            newMode = SelectionMode.Vertex;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            newMode = SelectionMode.Edge;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            newMode = SelectionMode.Face;
+        }
+
+        if (newMode != selectionMode)
+        {
+            ChangeMode(newMode);
+        }
+        
         if (selectionDisabled)
         {
             return;
@@ -312,5 +334,12 @@ public class SelectionManager : MonoBehaviour
             default:
                 return false;
         }
+    }
+    
+    void ChangeMode(SelectionMode newMode)
+    {
+        selectionMode = newMode;
+        modeText.text = $"Mode: {selectionMode}";
+        //ClearSelection();
     }
 }
