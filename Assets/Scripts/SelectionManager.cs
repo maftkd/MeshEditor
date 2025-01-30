@@ -97,6 +97,15 @@ public class SelectionManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //select all
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            SelectAll();
+            UndoRedoStack.Instance.Push(new SelectAction(_prevSelection, _selection));
+            return;
+        }
+        
+        //selection modes
         SelectionMode newMode = selectionMode;
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
@@ -289,6 +298,22 @@ public class SelectionManager : MonoBehaviour
             prim.selected = false;
         }
         _selection.Clear();
+        SelectionChanged?.Invoke();
+    }
+    
+    public void SelectAll()
+    {
+        ClearSelection();
+        foreach (Vertex v in mesh.vertices)
+        {
+            v.selected = true;
+            _selection.Add(v);
+        }
+        foreach (Edge e in mesh.edges)
+        {
+            e.selected = true;
+            _selection.Add(e);
+        }
         SelectionChanged?.Invoke();
     }
     
