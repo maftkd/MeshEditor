@@ -32,6 +32,7 @@ public class Deletion : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.X) && (Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.LeftControl)))
         {
+            List<ISelectionPrimitive> prevSelection = new List<ISelectionPrimitive>(selectionManager.selection);
             List<ISelectionPrimitive> deletedPrimitives = new List<ISelectionPrimitive>(selectionManager.selection);
             for (int i = deletedPrimitives.Count - 1; i >= 0; i--)
             {
@@ -58,7 +59,7 @@ public class Deletion : MonoBehaviour
                 }
             }
             selectionManager.ClearSelection();
-            UndoRedoStack.Instance.Push(new DeleteAction(deletedPrimitives));
+            UndoRedoStack.Instance.Push(new DeleteAction(deletedPrimitives, prevSelection));
         }
     }
     
@@ -74,20 +75,13 @@ public class Deletion : MonoBehaviour
                     {
                         case Vertex v:
                             myMesh.vertices.Add(v);
-                            if (selectionManager.selectionMode == SelectionMode.Vertex)
-                            {
-                                selectionManager.Select(v);
-                            }
                             break;
                         case Edge e:
                             myMesh.edges.Add(e);
-                            if (selectionManager.selectionMode == SelectionMode.Edge)
-                            {
-                                selectionManager.Select(e);
-                            }
                             break;
                     }
                 }
+                selectionManager.SetSelection(deleteAction.previousSelection);
             }
             else
             {
@@ -111,9 +105,8 @@ public class Deletion : MonoBehaviour
                             break;
                     }
                 }
-                //selectionManager.ClearSelection();
+                selectionManager.ClearSelection();
             }
-            selectionManager.SelectionChanged?.Invoke();
         }
     }
 }

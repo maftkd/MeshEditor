@@ -54,10 +54,12 @@ public class TranslateAction : IInputAction
 public class DeleteAction : IInputAction
 {
     public List<ISelectionPrimitive> deletedPrimitives;
+    public List<ISelectionPrimitive> previousSelection;
     
-    public DeleteAction(List<ISelectionPrimitive> deletedPrimitives)
+    public DeleteAction(List<ISelectionPrimitive> deletedPrimitives, List<ISelectionPrimitive> previousSelection)
     {
         this.deletedPrimitives = deletedPrimitives;
+        this.previousSelection = previousSelection;
     }
     
     public void DebugPrint()
@@ -65,6 +67,8 @@ public class DeleteAction : IInputAction
         Debug.Log("DeleteAction: ");
         Debug.Log("Deleted primitives: ");
         SelectionManager.DebugPrimitiveList(deletedPrimitives);
+        Debug.Log("Previous selection: ");
+        SelectionManager.DebugPrimitiveList(previousSelection);
         Debug.Log("************");
     }
 }
