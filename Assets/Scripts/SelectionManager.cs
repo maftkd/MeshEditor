@@ -7,6 +7,7 @@ public class SelectionManager : MonoBehaviour
 {
     private Camera _cam;
     public ClickPhysics clickPhysics;
+    public MyMesh mesh;
     
     // this is a class variable so we can maintain it over several update loops while box selecting
     private List<ISelectionPrimitive> _prevSelection = new();
@@ -155,6 +156,13 @@ public class SelectionManager : MonoBehaviour
 
                 for (int i = _selection.Count - 1; i >= 0; i--)
                 {
+                    //only do this deselection thing for primitives in the current selection mode
+                    // we have secondary prims like edges that get automatically selected via Select() or Deselect()
+                    // that aren't directly affected by the box selection
+                    if (!PrimMatchesMode(_selection[i]))
+                    {
+                        continue;
+                    }
                     if (!newSelection.Contains(_selection[i]))
                     {
                         if(Input.GetKey(KeyCode.LeftShift) && _prevSelection.Contains(_selection[i]))
@@ -187,12 +195,55 @@ public class SelectionManager : MonoBehaviour
     void Select(ISelectionPrimitive prim)
     {
         _selection.Add(prim);
+        switch (prim)
+        {
+            //when selecting a vertex, we also check to see if we have a full edge selected too
+            case Vertex v:
+                foreach (Edge e in mesh.edges)
+                {
+                    if (e.a == v || e.b == v)
+                    {
+                        if (!_selection.Contains(e))
+                        {
+                            if (_selection.Contains(e.a) && _selection.Contains(e.b))
+                            {
+                                Select(e);
+                            }
+                        }
+                    }
+                }
+                break;
+            case Edge e:
+                break;
+        }
         prim.selected = true;
     }
     
     void Deselect(ISelectionPrimitive prim)
     {
         _selection.Remove(prim);
+        switch (prim)
+        {
+            //when deselecting a vertex, we also check to see if we have broken any edges that should be deselected
+            case Vertex v:
+                foreach (Edge e in mesh.edges)
+                {
+                    if (e.a == v || e.b == v)
+                    {
+                        if (_selection.Contains(e))
+                        {
+                            if(!_selection.Contains(e.a) || !_selection.Contains(e.b))
+                            {
+                                Deselect(e);
+                            }
+                        }
+                    }
+                }
+                break;
+            case Edge e:
+                break;
+            
+        }
         prim.selected = false;
     }
 
@@ -246,5 +297,20 @@ public class SelectionManager : MonoBehaviour
             }
         }
         SelectionChanged?.Invoke();
+    }
+    
+    bool PrimMatchesMode(ISelectionPrimitive prim)
+    {
+        switch (selectionMode)
+        {
+            case SelectionMode.Vertex:
+                return prim is Vertex;
+            case SelectionMode.Edge:
+                return prim is Edge;
+            case SelectionMode.Face:
+                return false;
+            default:
+                return false;
+        }
     }
 }

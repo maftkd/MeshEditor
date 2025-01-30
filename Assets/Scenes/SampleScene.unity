@@ -693,6 +693,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   clickPhysics: {fileID: 145900049}
+  mesh: {fileID: 328348343}
   selectionDisabled: 0
   selectionMode: 0
 --- !u!4 &1546355040
