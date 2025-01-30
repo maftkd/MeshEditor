@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Rendering;
+using SelectionMode = SelectionManager.SelectionMode;
 
 /// <summary>
 /// Note that the "mesh" we are rendering here is not necessary a GL mesh with tris, normals, etc.
@@ -12,6 +13,7 @@ public class MyMeshRenderer : MonoBehaviour
     private Material _mat;
     public Mesh quadMesh;
     public MyMesh myMesh;
+    public SelectionManager selectionManager;
     
     // Start is called before the first frame update
     void Start()
@@ -24,7 +26,7 @@ public class MyMeshRenderer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (myMesh.vertices.Count > 0)
+        if (myMesh.vertices.Count > 0 && selectionManager.selectionMode == SelectionMode.Vertex)
         {
             int numInstances = myMesh.vertices.Count;
             MaterialPropertyBlock materialPropertyBlock = new MaterialPropertyBlock();

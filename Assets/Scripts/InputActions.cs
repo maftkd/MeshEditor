@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
+using SelectionMode = SelectionManager.SelectionMode;
 
 /// <summary>
 /// This file contains structures needed for the Undo / Redo stack
@@ -61,5 +62,20 @@ public class FormationAction : IInputAction
     public FormationAction(ISelectionPrimitive newPrimitive)
     {
         this.newPrimitive = newPrimitive;
+    }
+}
+
+public class ChangeModeAction : IInputAction
+{
+    public SelectionMode prevMode;
+    public SelectionMode newMode;
+    public SelectAction selectAction;
+    
+    public ChangeModeAction(SelectAction selectAction, 
+        SelectionMode prevMode, SelectionMode newMode)
+    {
+        this.selectAction = selectAction;
+        this.prevMode = prevMode;
+        this.newMode = newMode;
     }
 }

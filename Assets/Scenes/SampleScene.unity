@@ -285,6 +285,7 @@ MonoBehaviour:
   myVertexShader: {fileID: 4800000, guid: 991a890ba264346f08c66e48abeb2338, type: 3}
   quadMesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   myMesh: {fileID: 328348343}
+  selectionManager: {fileID: 1546355039}
 --- !u!1 &339584622
 GameObject:
   m_ObjectHideFlags: 0

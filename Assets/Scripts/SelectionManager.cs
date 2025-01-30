@@ -293,29 +293,50 @@ public class SelectionManager : MonoBehaviour
     {
         if (action is SelectAction selectAction)
         {
+            UndoRedoSelectAction(selectAction, wasUndo);
+        }
+        else if (action is ChangeModeAction changeModeAction)
+        {
+            //change mode
             if (wasUndo)
             {
-                foreach (ISelectionPrimitive prim in selectAction.newSelection)
-                {
-                    Deselect(prim);
-                }
-                
-                foreach (ISelectionPrimitive prim in selectAction.prevSelection)
-                {
-                    Select(prim);
-                }
+                selectionMode = changeModeAction.prevMode;
             }
             else
             {
-                foreach (ISelectionPrimitive prim in selectAction.prevSelection)
-                {
-                    Deselect(prim);
-                }
-                
-                foreach (ISelectionPrimitive prim in selectAction.newSelection)
-                {
-                    Select(prim);
-                }
+                selectionMode = changeModeAction.newMode;
+            }
+            modeText.text = $"Mode: {selectionMode}";
+            
+            //change selection
+            UndoRedoSelectAction(changeModeAction.selectAction, wasUndo);
+        }
+    }
+
+    void UndoRedoSelectAction(SelectAction selectAction, bool wasUndo)
+    {
+        if (wasUndo)
+        {
+            foreach (ISelectionPrimitive prim in selectAction.newSelection)
+            {
+                Deselect(prim);
+            }
+            
+            foreach (ISelectionPrimitive prim in selectAction.prevSelection)
+            {
+                Select(prim);
+            }
+        }
+        else
+        {
+            foreach (ISelectionPrimitive prim in selectAction.prevSelection)
+            {
+                Deselect(prim);
+            }
+            
+            foreach (ISelectionPrimitive prim in selectAction.newSelection)
+            {
+                Select(prim);
             }
         }
         SelectionChanged?.Invoke();
@@ -338,8 +359,62 @@ public class SelectionManager : MonoBehaviour
     
     void ChangeMode(SelectionMode newMode)
     {
+        SelectionMode prevMode = selectionMode;
+        _prevSelection = new List<ISelectionPrimitive>(_selection);
+        
+        //leave old mode - deselect hanging elements that don't fit in new mode
+        switch (prevMode)
+        {
+            case SelectionMode.Vertex:
+                switch (newMode)
+                {
+                    case SelectionMode.Edge:
+                        List<Vertex> includeVertices = new();
+                        List<Vertex> discludeVertices = new();
+                        
+                        //find all vertices that are part of a selected edge
+                        foreach (ISelectionPrimitive prim in selection)
+                        {
+                            if (prim is Edge e)
+                            {
+                                if (!includeVertices.Contains(e.a))
+                                {
+                                    includeVertices.Add(e.a);
+                                }
+                                if (!includeVertices.Contains(e.b))
+                                {
+                                    includeVertices.Add(e.b);
+                                }
+                            }
+                        }
+                        //find all vertices that are selected but not part of a selected edge
+                        foreach (ISelectionPrimitive prim in selection)
+                        {
+                            if (prim is Vertex v)
+                            {
+                                if (!includeVertices.Contains(v))
+                                {
+                                    discludeVertices.Add(v);
+                                }
+                            }
+                        }
+                        //deselect all vertices that are not part of a selected edge
+                        foreach (Vertex v in discludeVertices)
+                        {
+                            Deselect(v);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+        SelectionChanged?.Invoke();
         selectionMode = newMode;
         modeText.text = $"Mode: {selectionMode}";
+        UndoRedoStack.Instance.Push(new ChangeModeAction(new SelectAction(_prevSelection, _selection), prevMode, selectionMode));
         //ClearSelection();
     }
 }
