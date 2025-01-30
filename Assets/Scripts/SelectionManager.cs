@@ -209,17 +209,21 @@ public class SelectionManager : MonoBehaviour
         prim.selected = true;
         switch (prim)
         {
-            //when selecting a vertex, we also check to see if we have a full edge selected too
             case Vertex v:
-                foreach (Edge e in mesh.edges)
+                //in vertex selection mode, selecting vertices, sometimes auto-selects edges
+                if (selectionMode == SelectionMode.Vertex)
                 {
-                    if ((e.a == v || e.b == v) && !e.selected)
+                    foreach (Edge e in mesh.edges)
                     {
-                        if (e.a.selected && e.b.selected)
+                        if ((e.a == v || e.b == v) && !e.selected)
                         {
-                            Select(e);
+                            if (e.a.selected && e.b.selected)
+                            {
+                                Select(e);
+                            }
                         }
                     }
+                    
                 }
                 break;
             case Edge e:
@@ -242,15 +246,18 @@ public class SelectionManager : MonoBehaviour
         prim.selected = false;
         switch (prim)
         {
-            //when deselecting a vertex, we also check to see if we have broken any edges that should be deselected
             case Vertex v:
-                foreach (Edge e in mesh.edges)
+                //in vertex selection mode, auto deselect edges when one of its vertices is deselected
+                if (selectionMode == SelectionMode.Vertex)
                 {
-                    if ((e.a == v || e.b == v) && e.selected)
+                    foreach (Edge e in mesh.edges)
                     {
-                        if(!e.a.selected || !e.b.selected)
+                        if ((e.a == v || e.b == v) && e.selected)
                         {
-                            Deselect(e);
+                            if(!e.a.selected || !e.b.selected)
+                            {
+                                Deselect(e);
+                            }
                         }
                     }
                 }
@@ -402,6 +409,22 @@ public class SelectionManager : MonoBehaviour
                         foreach (Vertex v in discludeVertices)
                         {
                             Deselect(v);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case SelectionMode.Edge:
+                switch (newMode)
+                {
+                    case SelectionMode.Vertex:
+                        foreach (Edge e in mesh.edges)
+                        {
+                            if (!e.selected && e.a.selected && e.b.selected)
+                            {
+                                Select(e);
+                            }
                         }
                         break;
                     default:

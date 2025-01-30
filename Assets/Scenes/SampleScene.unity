@@ -761,6 +761,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shader: {fileID: 4800000, guid: 986a893cacce849699b932a5c0cffa60, type: 3}
   mesh: {fileID: 328348343}
+  selectionManager: {fileID: 1546355039}
 --- !u!1 &1283999590 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7706853491431558013, guid: 239434eacacdb4f8db2c188917386d5c, type: 3}
