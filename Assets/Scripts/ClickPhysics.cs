@@ -112,7 +112,21 @@ public class ClickPhysics : MonoBehaviour
     
 
     //box xy is min, zw is max, all in normalized 0 to 1 space
-    public List<ISelectionPrimitive> FrustumOverlap(Vector4 boxCoords)
+    public List<ISelectionPrimitive> FrustumOverlap(Vector4 boxCoords, SelectionMode selectionMode)
+    {
+        switch (selectionMode)
+        {
+            case SelectionMode.Vertex:
+                return FrustumOverlapVertices(boxCoords);
+                break;
+            case SelectionMode.Edge:
+                return FrustumOverlapEdges(boxCoords);
+                break;
+        }
+        return null;
+    }
+
+    List<ISelectionPrimitive> FrustumOverlapVertices(Vector4 boxCoords)
     {
         List<ISelectionPrimitive> selection = new();
         foreach (Vertex v in mesh.vertices)
@@ -121,18 +135,59 @@ public class ClickPhysics : MonoBehaviour
             float xMax = Mathf.Lerp(-1f, 1f, boxCoords.z);
             float yMin = Mathf.Lerp(-1f, 1f, boxCoords.y);
             float yMax = Mathf.Lerp(-1f, 1f, boxCoords.w);
-            Vector4 viewPos = _cam.worldToCameraMatrix * new Vector4(v.position.x, v.position.y, v.position.z, 1.0f);
-            if(-viewPos.z < _cam.nearClipPlane || -viewPos.z > _cam.farClipPlane)
+            if (PointIsInsideFrustumRegion(xMin, xMax, yMin, yMax, v.position, out Vector4 clipPos))
+            {
+                selection.Add(v);
+            }
+        }
+
+        return selection;
+    }
+    
+    bool PointIsInsideFrustumRegion(float xMin, float xMax, float yMin, float yMax, Vector4 worldPos, out Vector4 clipPos)
+    {
+        clipPos = Vector4.zero;
+        Vector4 viewPos = _cam.worldToCameraMatrix * new Vector4(worldPos.x, worldPos.y, worldPos.z, 1.0f);
+        if(-viewPos.z < _cam.nearClipPlane || -viewPos.z > _cam.farClipPlane)
+        {
+            return false;
+        }
+        clipPos = _cam.projectionMatrix * viewPos;
+        clipPos /= clipPos.w;
+        return clipPos.x >= xMin && clipPos.x <= xMax && clipPos.y >= yMin && clipPos.y <= yMax;
+    }
+    
+    List<ISelectionPrimitive> FrustumOverlapEdges(Vector4 boxCoords)
+    {
+        List<ISelectionPrimitive> selection = new();
+        foreach (Edge e in mesh.edges)
+        {
+            float xMin = Mathf.Lerp(-1f, 1f, boxCoords.x);
+            float xMax = Mathf.Lerp(-1f, 1f, boxCoords.z);
+            float yMin = Mathf.Lerp(-1f, 1f, boxCoords.y);
+            float yMax = Mathf.Lerp(-1f, 1f, boxCoords.w);
+            if (PointIsInsideFrustumRegion(xMin, xMax, yMin, yMax, e.a.position, out Vector4 clipA))
+            {
+                selection.Add(e);
+                continue;
+            }
+
+            if (PointIsInsideFrustumRegion(xMin, xMax, yMin, yMax, e.b.position, out Vector4 clipB))
+            {
+                selection.Add(e);
+                continue;
+            }
+            
+            if(clipA == Vector4.zero || clipB == Vector4.zero)
             {
                 continue;
             }
-            Vector4 clipPos = _cam.projectionMatrix * viewPos;
-            clipPos /= clipPos.w;
-            if (clipPos.x < xMin || clipPos.x > xMax || clipPos.y < yMin || clipPos.y > yMax)
+            
+            //check if the edge intersects the box
+            if (SegmentIntersectRectangle(xMin, xMax, yMin, yMax, clipA.x, clipA.y, clipB.x, clipB.y))
             {
-                continue;
+                selection.Add(e);
             }
-            selection.Add(v);
         }
 
         return selection;
@@ -177,5 +232,76 @@ public class ClickPhysics : MonoBehaviour
             if( h>0.0 ) return -b - Mathf.Sqrt(h);
         }
         return -1.0f;
+    }
+    
+    // https://stackoverflow.com/questions/99353/how-to-test-if-a-line-segment-intersects-an-axis-aligned-rectange-in-2d
+    // Answer by Metamal
+    bool SegmentIntersectRectangle(float xMin, float xMax, float yMin, float yMax, float a_p1x, float a_p1y, float a_p2x, float a_p2y)
+    {
+            
+        // Find min and max X for the segment
+        float minX = a_p1x;
+        float maxX = a_p2x;
+
+        if(a_p1x > a_p2x)
+        {
+            minX = a_p2x;
+            maxX = a_p1x;
+        }
+
+        // Find the intersection of the segment's and rectangle's x-projections
+        if(maxX > xMax)
+        {
+            maxX = xMax;
+        }
+
+        if(minX < xMin)
+        {
+            minX = xMin;
+        }
+        
+        // If their projections do not intersect return false
+        if(minX > maxX) 
+        {
+            return false;
+        }
+
+        // Find corresponding min and max Y for min and max X we found before
+        float minY = a_p1y;
+        float maxY = a_p2y;
+
+        float dx = a_p2x - a_p1x;
+
+        if(Mathf.Abs(dx) > 0.0000001)
+        {
+            float a = (a_p2y - a_p1y) / dx;
+            float b = a_p1y - a * a_p1x;
+            minY = a * minX + b;
+            maxY = a * maxX + b;
+        }
+
+        if(minY > maxY)
+        {
+            (maxY, minY) = (minY, maxY);
+        }
+
+        // Find the intersection of the segment's and rectangle's y-projections
+        if(maxY > yMax)
+        {
+            maxY = yMax;
+        }
+
+        if(minY < yMin)
+        {
+            minY = yMin;
+        }
+        
+        // If Y-projections do not intersect return false
+        if(minY > maxY) 
+        {
+            return false;
+        }
+
+        return true;
     }
 }
