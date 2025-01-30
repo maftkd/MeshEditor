@@ -2,7 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
+using Vertex = SelectionManager.Vertex;
+using Edge = SelectionManager.Edge;
 
 public class Deletion : MonoBehaviour
 {
@@ -29,9 +32,29 @@ public class Deletion : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.X) && (Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.LeftControl)))
         {
             List<ISelectionPrimitive> deletedPrimitives = new List<ISelectionPrimitive>(selectionManager.selection);
-            for (int i = selectionManager.selection.Count - 1; i >= 0; i--)
+            for (int i = deletedPrimitives.Count - 1; i >= 0; i--)
             {
-                myMesh.vertices.Remove((SelectionManager.Vertex)selectionManager.selection[i]);
+                ISelectionPrimitive prim = deletedPrimitives[i];
+                switch (prim)
+                {
+                    case Vertex v:
+                        myMesh.vertices.Remove(v);
+                        
+                        //removing a vertex that belongs to an edge results in deletion of that edge too
+                        for (int j = myMesh.edges.Count - 1; j >= 0; j--)
+                        {
+                            Edge edge = myMesh.edges[j];
+                            if (edge.a == v || edge.b == v)
+                            {
+                                myMesh.edges.Remove(edge);
+                                deletedPrimitives.Add(edge);
+                            }
+                        }
+                        break;
+                    case Edge e:
+                        myMesh.edges.Remove(e);
+                        break;
+                }
             }
             selectionManager.ClearSelection();
             UndoRedoStack.Instance.Push(new DeleteAction(deletedPrimitives));
@@ -46,15 +69,32 @@ public class Deletion : MonoBehaviour
             {
                 foreach (var primitive in deleteAction.deletedPrimitives)
                 {
-                    myMesh.vertices.Add((SelectionManager.Vertex)primitive);
+                    switch (primitive)
+                    {
+                        case Vertex v:
+                            myMesh.vertices.Add(v);
+                            break;
+                        case Edge e:
+                            myMesh.edges.Add(e);
+                            break;
+                    }
                 }
                 selectionManager.SetSelection(deleteAction.deletedPrimitives);
             }
             else
             {
-                foreach (var primitive in deleteAction.deletedPrimitives)
+                foreach (ISelectionPrimitive primitive in deleteAction.deletedPrimitives)
                 {
-                    myMesh.vertices.Remove((SelectionManager.Vertex)primitive);
+                    //myMesh.vertices.Remove((SelectionManager.Vertex)primitive);
+                    switch (primitive)
+                    {
+                        case Vertex v:
+                            myMesh.vertices.Remove(v);
+                            break;
+                        case Edge e:
+                            myMesh.edges.Remove(e);
+                            break;
+                    }
                 }
                 selectionManager.ClearSelection();
             }

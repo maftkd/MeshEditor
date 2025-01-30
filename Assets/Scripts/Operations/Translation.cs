@@ -2,6 +2,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
+using SelectionMode = SelectionManager.SelectionMode;
 
 public class Translation : MonoBehaviour
 {
@@ -58,17 +59,41 @@ public class Translation : MonoBehaviour
         else if(selectionManager.selection.Count == 1)
         {
             gizmoGO.SetActive(true);
-            gizmoGO.transform.position = ((SelectionManager.Vertex)selectionManager.selection[0]).position;
+            switch (selectionManager.selectionMode)
+            {
+                case SelectionMode.Vertex:
+                    gizmoGO.transform.position = ((SelectionManager.Vertex)selectionManager.selection[0]).position;
+                    break;
+                case SelectionMode.Edge:
+                    Vector3 a = ((SelectionManager.Edge)selectionManager.selection[0]).a.position;
+                    Vector3 b = ((SelectionManager.Edge)selectionManager.selection[0]).b.position;
+                    gizmoGO.transform.position = (a + b) / 2;
+                    break;
+            }
         }
         else
         {
             Vector3 average = Vector3.zero;
+            int count = 0;
             foreach (var selection in selectionManager.selection)
             {
-                average += ((SelectionManager.Vertex)selection).position;
+                if (selectionManager.selectionMode == SelectionMode.Vertex && selection is SelectionManager.Vertex)
+                {
+                    average += ((SelectionManager.Vertex)selection).position;
+                    count++;
+                }
+                else if(selectionManager.selectionMode == SelectionMode.Edge && selection is SelectionManager.Edge)
+                {
+                    average += ((SelectionManager.Edge)selection).a.position;
+                    average += ((SelectionManager.Edge)selection).b.position;
+                    count += 2;
+                }
             }
-            
-            average /= selectionManager.selection.Count;
+
+            if (count > 0)
+            {
+                average /= count;
+            }
             gizmoGO.SetActive(true);
             gizmoGO.transform.position = average;
         }
