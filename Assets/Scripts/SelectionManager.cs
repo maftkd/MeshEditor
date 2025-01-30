@@ -167,7 +167,15 @@ public class SelectionManager : MonoBehaviour
                 
                 Vector4 selectionBox = new Vector4(boxMinX / Screen.width, boxMinY / Screen.height, 
                     boxMaxX / Screen.width, boxMaxY / Screen.height);
-                List<ISelectionPrimitive> newSelection = clickPhysics.FrustumOverlap(selectionBox);
+                List<ISelectionPrimitive> newSelection = clickPhysics.FrustumOverlap(selectionBox, selectionMode);
+                ClearSelection();
+                if (Input.GetKey(KeyCode.LeftShift))
+                {
+                    foreach (ISelectionPrimitive prim in _prevSelection)
+                    {
+                        Select(prim);
+                    }
+                }
                 foreach(ISelectionPrimitive prim in newSelection)
                 {
                     if (!_selection.Contains(prim))
@@ -176,25 +184,6 @@ public class SelectionManager : MonoBehaviour
                     }
                 }
 
-                for (int i = _selection.Count - 1; i >= 0; i--)
-                {
-                    //only do this deselection thing for primitives in the current selection mode
-                    // we have secondary prims like edges that get automatically selected via Select() or Deselect()
-                    // that aren't directly affected by the box selection
-                    if (!PrimMatchesMode(_selection[i]))
-                    {
-                        continue;
-                    }
-                    if (!newSelection.Contains(_selection[i]))
-                    {
-                        if(Input.GetKey(KeyCode.LeftShift) && _prevSelection.Contains(_selection[i]))
-                        {
-                            //don't deselect if it was part of the previous selection
-                            continue;
-                        }
-                        Deselect(_selection[i]);
-                    }
-                }
                 SelectionChanged?.Invoke();
                     
             }
@@ -250,6 +239,7 @@ public class SelectionManager : MonoBehaviour
     public void Deselect(ISelectionPrimitive prim)
     {
         _selection.Remove(prim);
+        prim.selected = false;
         switch (prim)
         {
             //when deselecting a vertex, we also check to see if we have broken any edges that should be deselected
@@ -266,10 +256,17 @@ public class SelectionManager : MonoBehaviour
                 }
                 break;
             case Edge e:
+                if (e.a.selected)
+                {
+                    Deselect(e.a);
+                }
+                if(e.b.selected)
+                {
+                    Deselect(e.b);
+                }
                 break;
             
         }
-        prim.selected = false;
     }
 
     public void ClearSelection()
