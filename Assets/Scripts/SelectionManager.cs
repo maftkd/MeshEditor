@@ -217,37 +217,34 @@ public class SelectionManager : MonoBehaviour
     public void Select(ISelectionPrimitive prim)
     {
         _selection.Add(prim);
+        prim.selected = true;
         switch (prim)
         {
             //when selecting a vertex, we also check to see if we have a full edge selected too
             case Vertex v:
                 foreach (Edge e in mesh.edges)
                 {
-                    if (e.a == v || e.b == v)
+                    if ((e.a == v || e.b == v) && !e.selected)
                     {
-                        if (!_selection.Contains(e))
+                        if (e.a.selected && e.b.selected)
                         {
-                            if (_selection.Contains(e.a) && _selection.Contains(e.b))
-                            {
-                                Select(e);
-                            }
+                            Select(e);
                         }
                     }
                 }
                 break;
             case Edge e:
-                if (!selection.Contains(e.a))
+                if (!e.a.selected)
                 {
                     Select(e.a);
                 }
 
-                if (!selection.Contains(e.b))
+                if (!e.b.selected)
                 {
                     Select(e.b);
                 }
                 break;
         }
-        prim.selected = true;
     }
     
     public void Deselect(ISelectionPrimitive prim)
@@ -259,14 +256,11 @@ public class SelectionManager : MonoBehaviour
             case Vertex v:
                 foreach (Edge e in mesh.edges)
                 {
-                    if (e.a == v || e.b == v)
+                    if ((e.a == v || e.b == v) && e.selected)
                     {
-                        if (_selection.Contains(e))
+                        if(!e.a.selected || !e.b.selected)
                         {
-                            if(!_selection.Contains(e.a) || !_selection.Contains(e.b))
-                            {
-                                Deselect(e);
-                            }
+                            Deselect(e);
                         }
                     }
                 }
@@ -425,5 +419,34 @@ public class SelectionManager : MonoBehaviour
         modeText.text = $"Mode: {selectionMode}";
         UndoRedoStack.Instance.Push(new ChangeModeAction(new SelectAction(_prevSelection, _selection), prevMode, selectionMode));
         //ClearSelection();
+    }
+
+    [ContextMenu("Debug Selection")]
+    public void DebugSelection()
+    {
+        DebugPrimitiveList(selection);
+    }
+
+    public static void DebugPrimitiveList(List<ISelectionPrimitive> prims)
+    {
+        string dbg = "";
+        foreach (ISelectionPrimitive prim in prims)
+        {
+            DebugPrimitive(prim, ref dbg);
+        }
+        Debug.Log(dbg);
+    }
+
+    public static void DebugPrimitive(ISelectionPrimitive prim, ref string dbg)
+    {
+        switch (prim)
+        {
+            case Vertex v:
+                dbg += $"Vertex: {v.position}\n";
+                break;
+            case Edge e:
+                dbg += $"Edge: {e.a.position} - {e.b.position}\n";
+                break;
+        }
     }
 }

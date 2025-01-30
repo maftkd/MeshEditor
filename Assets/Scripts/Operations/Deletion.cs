@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
+using SelectionMode = SelectionManager.SelectionMode;
 using Vertex = SelectionManager.Vertex;
 using Edge = SelectionManager.Edge;
 
@@ -73,31 +74,46 @@ public class Deletion : MonoBehaviour
                     {
                         case Vertex v:
                             myMesh.vertices.Add(v);
+                            if (selectionManager.selectionMode == SelectionMode.Vertex)
+                            {
+                                selectionManager.Select(v);
+                            }
                             break;
                         case Edge e:
                             myMesh.edges.Add(e);
+                            if (selectionManager.selectionMode == SelectionMode.Edge)
+                            {
+                                selectionManager.Select(e);
+                            }
                             break;
                     }
                 }
-                selectionManager.SetSelection(deleteAction.deletedPrimitives);
             }
             else
             {
                 foreach (ISelectionPrimitive primitive in deleteAction.deletedPrimitives)
                 {
-                    //myMesh.vertices.Remove((SelectionManager.Vertex)primitive);
                     switch (primitive)
                     {
                         case Vertex v:
                             myMesh.vertices.Remove(v);
+                            if (selectionManager.selectionMode == SelectionMode.Vertex)
+                            {
+                                selectionManager.Deselect(v);
+                            }
                             break;
                         case Edge e:
                             myMesh.edges.Remove(e);
+                            if (selectionManager.selectionMode == SelectionMode.Edge)
+                            {
+                                selectionManager.Deselect(e);
+                            }
                             break;
                     }
                 }
-                selectionManager.ClearSelection();
+                //selectionManager.ClearSelection();
             }
+            selectionManager.SelectionChanged?.Invoke();
         }
     }
 }

@@ -9,6 +9,7 @@ using SelectionMode = SelectionManager.SelectionMode;
 /// </summary>
 public interface IInputAction
 {
+    public void DebugPrint();
 }
 
 public class SelectAction : IInputAction
@@ -21,6 +22,16 @@ public class SelectAction : IInputAction
         this.prevSelection = new List<ISelectionPrimitive>(prevSelection);
         this.newSelection = new List<ISelectionPrimitive>(newSelection);
     }
+
+    public void DebugPrint()
+    {
+        Debug.Log("SelectAction: ");
+        Debug.Log("Prev selection: ");
+        SelectionManager.DebugPrimitiveList(prevSelection);
+        Debug.Log("New selection: ");
+        SelectionManager.DebugPrimitiveList(newSelection);
+        Debug.Log("************");
+    }
 }
 
 public class TranslateAction : IInputAction
@@ -31,6 +42,13 @@ public class TranslateAction : IInputAction
     {
         this.delta = delta;
     }
+    
+    public void DebugPrint()
+    {
+        Debug.Log("TranslateAction: ");
+        Debug.Log("Delta: " + delta);
+        Debug.Log("************");
+    }
 }
 
 public class DeleteAction : IInputAction
@@ -40,6 +58,14 @@ public class DeleteAction : IInputAction
     public DeleteAction(List<ISelectionPrimitive> deletedPrimitives)
     {
         this.deletedPrimitives = deletedPrimitives;
+    }
+    
+    public void DebugPrint()
+    {
+        Debug.Log("DeleteAction: ");
+        Debug.Log("Deleted primitives: ");
+        SelectionManager.DebugPrimitiveList(deletedPrimitives);
+        Debug.Log("************");
     }
 }
 
@@ -53,6 +79,16 @@ public class DuplicateAction : IInputAction
         this.duplicatedPrimitives = duplicatedPrimitives;
         this.previousSelection = previousSelection;
     }
+    
+    public void DebugPrint()
+    {
+        Debug.Log("DuplicateAction: ");
+        Debug.Log("Duplicated primitives: ");
+        SelectionManager.DebugPrimitiveList(duplicatedPrimitives);
+        Debug.Log("Previous selection: ");
+        SelectionManager.DebugPrimitiveList(previousSelection);
+        Debug.Log("************");
+    }
 }
 
 public class FormationAction : IInputAction
@@ -62,6 +98,16 @@ public class FormationAction : IInputAction
     public FormationAction(ISelectionPrimitive newPrimitive)
     {
         this.newPrimitive = newPrimitive;
+    }
+    
+    public void DebugPrint()
+    {
+        Debug.Log("FormationAction: ");
+        Debug.Log("New primitive: ");
+        string foo = "";
+        SelectionManager.DebugPrimitive(newPrimitive, ref foo);
+        Debug.Log(foo);
+        Debug.Log("************");
     }
 }
 
@@ -77,5 +123,14 @@ public class ChangeModeAction : IInputAction
         this.selectAction = selectAction;
         this.prevMode = prevMode;
         this.newMode = newMode;
+    }
+    
+    public void DebugPrint()
+    {
+        Debug.Log("ChangeModeAction: ");
+        Debug.Log("Prev mode: " + prevMode);
+        Debug.Log("New mode: " + newMode);
+        selectAction.DebugPrint();
+        Debug.Log("************");
     }
 }

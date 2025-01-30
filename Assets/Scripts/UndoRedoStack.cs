@@ -11,6 +11,8 @@ public class UndoRedoStack : MonoBehaviour
     
     public static UndoRedoStack Instance;
 
+    public bool debugAllActions;
+
     private void Awake()
     {
         Instance = this;
@@ -43,6 +45,12 @@ public class UndoRedoStack : MonoBehaviour
             IInputAction action = _undoStack.Pop();
             _redoStack.Push(action);
             UndoRedo?.Invoke(action, true);
+
+            if (debugAllActions)
+            {
+                Debug.Log("Undo:");
+                action.DebugPrint();
+            }
         }
     }
 
@@ -53,6 +61,12 @@ public class UndoRedoStack : MonoBehaviour
             IInputAction action = _redoStack.Pop();
             _undoStack.Push(action);
             UndoRedo?.Invoke(action, false);
+            
+            if (debugAllActions)
+            {
+                Debug.Log("Redo:");
+                action.DebugPrint();
+            }
         }
     }
     
@@ -60,5 +74,11 @@ public class UndoRedoStack : MonoBehaviour
     {
         _undoStack.Push(action);
         _redoStack.Clear();
+        
+        if (debugAllActions)
+        {
+            Debug.Log("Perform:");
+            action.DebugPrint();
+        }
     }
 }
