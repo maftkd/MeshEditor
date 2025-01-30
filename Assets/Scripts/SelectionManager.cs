@@ -236,6 +236,15 @@ public class SelectionManager : MonoBehaviour
                 }
                 break;
             case Edge e:
+                if (!selection.Contains(e.a))
+                {
+                    Select(e.a);
+                }
+
+                if (!selection.Contains(e.b))
+                {
+                    Select(e.b);
+                }
                 break;
         }
         prim.selected = true;
