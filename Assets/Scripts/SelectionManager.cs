@@ -132,38 +132,42 @@ public class SelectionManager : MonoBehaviour
                 return;
             }
             _boxEnd = Input.mousePosition;
-            float boxMinX = Mathf.Min(_boxStart.x, _boxEnd.x);
-            float boxMaxX = Mathf.Max(_boxStart.x, _boxEnd.x);
-            float boxMinY = Mathf.Min(_boxStart.y, _boxEnd.y);
-            float boxMaxY = Mathf.Max(_boxStart.y, _boxEnd.y);
-            //note y max, min are swapped to match the gpu's frag coords
-            Shader.SetGlobalVector("_Box", new Vector4(boxMinX, Screen.height - boxMaxY, 
-                boxMaxX, Screen.height - boxMinY));
-            
-            Vector4 selectionBox = new Vector4(boxMinX / Screen.width, boxMinY / Screen.height, 
-                boxMaxX / Screen.width, boxMaxY / Screen.height);
-            List<ISelectionPrimitive> newSelection = clickPhysics.FrustumOverlap(selectionBox);
-            foreach(ISelectionPrimitive prim in newSelection)
+            if ((_boxStart - _boxEnd).sqrMagnitude > 10)
             {
-                if (!_selection.Contains(prim))
+                float boxMinX = Mathf.Min(_boxStart.x, _boxEnd.x);
+                float boxMaxX = Mathf.Max(_boxStart.x, _boxEnd.x);
+                float boxMinY = Mathf.Min(_boxStart.y, _boxEnd.y);
+                float boxMaxY = Mathf.Max(_boxStart.y, _boxEnd.y);
+                //note y max, min are swapped to match the gpu's frag coords
+                Shader.SetGlobalVector("_Box", new Vector4(boxMinX, Screen.height - boxMaxY, 
+                    boxMaxX, Screen.height - boxMinY));
+                
+                Vector4 selectionBox = new Vector4(boxMinX / Screen.width, boxMinY / Screen.height, 
+                    boxMaxX / Screen.width, boxMaxY / Screen.height);
+                List<ISelectionPrimitive> newSelection = clickPhysics.FrustumOverlap(selectionBox);
+                foreach(ISelectionPrimitive prim in newSelection)
                 {
-                    Select(prim);
-                }
-            }
-
-            for (int i = _selection.Count - 1; i >= 0; i--)
-            {
-                if (!newSelection.Contains(_selection[i]))
-                {
-                    if(Input.GetKey(KeyCode.LeftShift) && _prevSelection.Contains(_selection[i]))
+                    if (!_selection.Contains(prim))
                     {
-                        //don't deselect if it was part of the previous selection
-                        continue;
+                        Select(prim);
                     }
-                    Deselect(_selection[i]);
                 }
+
+                for (int i = _selection.Count - 1; i >= 0; i--)
+                {
+                    if (!newSelection.Contains(_selection[i]))
+                    {
+                        if(Input.GetKey(KeyCode.LeftShift) && _prevSelection.Contains(_selection[i]))
+                        {
+                            //don't deselect if it was part of the previous selection
+                            continue;
+                        }
+                        Deselect(_selection[i]);
+                    }
+                }
+                SelectionChanged?.Invoke();
+                    
             }
-            SelectionChanged?.Invoke();
         }
         else if (Input.GetMouseButtonUp(0))
         {
