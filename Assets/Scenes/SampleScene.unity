@@ -656,6 +656,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c84422138f6d549dcada93367d6f78b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shader: {fileID: 4800000, guid: 986a893cacce849699b932a5c0cffa60, type: 3}
   mesh: {fileID: 328348343}
 --- !u!1 &1283999590 stripped
 GameObject:
