@@ -67,6 +67,11 @@ public class SelectionManager : MonoBehaviour
         {
             return new Edge(a, b);
         }
+
+        public bool Contains(Vertex v)
+        {
+            return v==a || v==b;
+        }
     }
     
     public SelectionMode selectionMode = SelectionMode.Vertex;

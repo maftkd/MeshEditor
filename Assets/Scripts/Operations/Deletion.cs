@@ -1,8 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
 using SelectionMode = SelectionManager.SelectionMode;
 using Vertex = SelectionManager.Vertex;
@@ -33,28 +30,76 @@ public class Deletion : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.X) && (Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.LeftControl)))
         {
             List<ISelectionPrimitive> prevSelection = new List<ISelectionPrimitive>(selectionManager.selection);
-            List<ISelectionPrimitive> deletedPrimitives = new List<ISelectionPrimitive>(selectionManager.selection);
-            for (int i = deletedPrimitives.Count - 1; i >= 0; i--)
+            List<ISelectionPrimitive> deletedPrimitives = new();
+            if (selectionManager.selectionMode == SelectionMode.Vertex)
             {
-                ISelectionPrimitive prim = deletedPrimitives[i];
+                foreach (ISelectionPrimitive prim in prevSelection)
+                {
+                    switch (prim)
+                    {
+                        case Vertex v:
+                            deletedPrimitives.Add(v);
+                            
+                            //removing a vertex that belongs to an edge results in deletion of that edge too
+                            foreach (Edge e in myMesh.edges)
+                            {
+                                if (e.Contains(v) && !deletedPrimitives.Contains(e))
+                                {
+                                    deletedPrimitives.Add(e);
+                                }
+                            }
+                            break;
+                        case Edge e:
+                            if (!deletedPrimitives.Contains(e))
+                            {
+                                deletedPrimitives.Add(e);
+                            }
+                            //myMesh.edges.Remove(e);
+                            break;
+                    }
+                }
+            }
+            else if (selectionManager.selectionMode == SelectionMode.Edge)
+            {
+                //remove edges
+                foreach (ISelectionPrimitive prim in prevSelection)
+                {
+                    if (prim is Edge e)
+                    {
+                        deletedPrimitives.Add(e);
+                    }
+                }
+                
+                //also remove vertices associated with those edges that aren't shared with any other remaining edges
+                foreach (Vertex v in myMesh.vertices)
+                {
+                    bool vertexShsaredWithRemainingEdge = false;
+                    foreach (Edge e in myMesh.edges)
+                    {
+                        if (e.Contains(v) && !deletedPrimitives.Contains(e))
+                        {
+                            vertexShsaredWithRemainingEdge = true;
+                            break;
+                        }
+                    }
+                    if(!vertexShsaredWithRemainingEdge)
+                    {
+                        deletedPrimitives.Add(v);
+                    }
+                }
+            }
+
+            foreach (ISelectionPrimitive prim in deletedPrimitives)
+            {
                 switch (prim)
                 {
                     case Vertex v:
                         myMesh.vertices.Remove(v);
-                        
-                        //removing a vertex that belongs to an edge results in deletion of that edge too
-                        for (int j = myMesh.edges.Count - 1; j >= 0; j--)
-                        {
-                            Edge edge = myMesh.edges[j];
-                            if (edge.a == v || edge.b == v)
-                            {
-                                myMesh.edges.Remove(edge);
-                                deletedPrimitives.Add(edge);
-                            }
-                        }
                         break;
                     case Edge e:
                         myMesh.edges.Remove(e);
+                        break;
+                    default:
                         break;
                 }
             }
