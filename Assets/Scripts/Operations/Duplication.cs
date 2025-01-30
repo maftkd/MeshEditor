@@ -49,15 +49,15 @@ public class Duplication : MonoBehaviour
                     if (!oldToNewVertices.ContainsKey(e.a))
                     {
                         oldToNewVertices.Add(e.a, newA);
+                        _duplicatedPrimitives.Add(newA);
                     }
                     if (!oldToNewVertices.ContainsKey(e.b))
                     {
                         oldToNewVertices.Add(e.b, newB);
+                        _duplicatedPrimitives.Add(newB);
                     }
                     Edge newEdge = new Edge(newA, newB);
                     _duplicatedPrimitives.Add(newEdge);
-                    _duplicatedPrimitives.Add(newA);
-                    _duplicatedPrimitives.Add(newB);
                 }
             }
             
