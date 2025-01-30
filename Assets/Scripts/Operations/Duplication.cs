@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
@@ -36,24 +37,34 @@ public class Duplication : MonoBehaviour
         {
             _duplicatedPrimitives = new List<ISelectionPrimitive>();
             _previousSelection = new List<ISelectionPrimitive>(selectionManager.selection);
-            
+
+            Dictionary<Vertex, Vertex> oldToNewVertices = new();
             //first go through higher-order prims
             foreach (ISelectionPrimitive prim in selectionManager.selection)
             {
                 if (prim is Edge e)
                 {
-                    Vertex newA = (Vertex)e.a.Copy();
-                    Vertex newB = (Vertex)e.b.Copy();
+                    Vertex newA = oldToNewVertices.ContainsKey(e.a) ? oldToNewVertices[e.a] : (Vertex)e.a.Copy();
+                    Vertex newB = oldToNewVertices.ContainsKey(e.b) ? oldToNewVertices[e.b] : (Vertex)e.b.Copy();
+                    if (!oldToNewVertices.ContainsKey(e.a))
+                    {
+                        oldToNewVertices.Add(e.a, newA);
+                    }
+                    if (!oldToNewVertices.ContainsKey(e.b))
+                    {
+                        oldToNewVertices.Add(e.b, newB);
+                    }
                     Edge newEdge = new Edge(newA, newB);
                     _duplicatedPrimitives.Add(newEdge);
                     _duplicatedPrimitives.Add(newA);
                     _duplicatedPrimitives.Add(newB);
                 }
             }
+            
             // then lower order
             foreach(ISelectionPrimitive prim in selectionManager.selection)
             {
-                if (prim is Vertex v && !_duplicatedPrimitives.Contains(prim))
+                if (prim is Vertex v && !oldToNewVertices.ContainsKey(v))
                 {
                     Vertex newV = (Vertex)v.Copy();
                     _duplicatedPrimitives.Add(newV);
