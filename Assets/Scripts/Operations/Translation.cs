@@ -65,11 +65,6 @@ public class Translation : MonoBehaviour
                 case SelectionMode.Vertex:
                     gizmoGO.transform.position = ((Vertex)selectionManager.selection[0]).position;
                     break;
-                case SelectionMode.Edge:
-                    Vector3 a = ((SelectionManager.Edge)selectionManager.selection[0]).a.position;
-                    Vector3 b = ((SelectionManager.Edge)selectionManager.selection[0]).b.position;
-                    gizmoGO.transform.position = (a + b) / 2;
-                    break;
             }
         }
         else
@@ -78,16 +73,10 @@ public class Translation : MonoBehaviour
             int count = 0;
             foreach (var selection in selectionManager.selection)
             {
-                if (selectionManager.selectionMode == SelectionMode.Vertex && selection is Vertex v)
+                if (selection is Vertex v)
                 {
                     average += v.position;
                     count++;
-                }
-                else if(selectionManager.selectionMode == SelectionMode.Edge && selection is SelectionManager.Edge)
-                {
-                    average += ((SelectionManager.Edge)selection).a.position;
-                    average += ((SelectionManager.Edge)selection).b.position;
-                    count += 2;
                 }
             }
 
