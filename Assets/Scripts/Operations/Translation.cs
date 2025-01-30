@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
 using SelectionMode = SelectionManager.SelectionMode;
+using Vertex = SelectionManager.Vertex;
 
 public class Translation : MonoBehaviour
 {
@@ -62,7 +63,7 @@ public class Translation : MonoBehaviour
             switch (selectionManager.selectionMode)
             {
                 case SelectionMode.Vertex:
-                    gizmoGO.transform.position = ((SelectionManager.Vertex)selectionManager.selection[0]).position;
+                    gizmoGO.transform.position = ((Vertex)selectionManager.selection[0]).position;
                     break;
                 case SelectionMode.Edge:
                     Vector3 a = ((SelectionManager.Edge)selectionManager.selection[0]).a.position;
@@ -77,9 +78,9 @@ public class Translation : MonoBehaviour
             int count = 0;
             foreach (var selection in selectionManager.selection)
             {
-                if (selectionManager.selectionMode == SelectionMode.Vertex && selection is SelectionManager.Vertex)
+                if (selectionManager.selectionMode == SelectionMode.Vertex && selection is Vertex v)
                 {
-                    average += ((SelectionManager.Vertex)selection).position;
+                    average += v.position;
                     count++;
                 }
                 else if(selectionManager.selectionMode == SelectionMode.Edge && selection is SelectionManager.Edge)
@@ -236,8 +237,10 @@ public class Translation : MonoBehaviour
         delta.z *= _axesConstraints.z;
         foreach (ISelectionPrimitive prim in selectionManager.selection)
         {
-            SelectionManager.Vertex vertex = (SelectionManager.Vertex) prim;
-            vertex.position += delta;
+            if(prim is Vertex v)
+            {
+                v.position += delta;
+            }
         }
         _currentPos += delta;
     }
@@ -295,8 +298,10 @@ public class Translation : MonoBehaviour
             Vector3 delta = translateAction.delta;
             foreach (ISelectionPrimitive prim in selectionManager.selection)
             {
-                SelectionManager.Vertex vertex = (SelectionManager.Vertex) prim;
-                vertex.position += delta * sign;
+                if (prim is Vertex v)
+                {
+                    v.position += delta * sign;
+                }
             }
             gizmoGO.transform.position += delta * sign;
             _startPos = gizmoGO.transform.position;
