@@ -16,6 +16,7 @@ public class SelectionManager : MonoBehaviour
     public List<ISelectionPrimitive> selection => _selection;
     public Action SelectionChanged;
     public bool selectionDisabled;
+    public bool selectionDisabledViaCamera;
     public TextMeshProUGUI modeText;
     
     private Vector3 _boxStart;
@@ -115,7 +116,7 @@ public class SelectionManager : MonoBehaviour
             ChangeMode(newMode);
         }
         
-        if (selectionDisabled)
+        if (selectionDisabled || selectionDisabledViaCamera)
         {
             return;
         }

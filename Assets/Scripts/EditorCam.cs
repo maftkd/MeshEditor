@@ -6,74 +6,80 @@ using UnityEngine;
 /// </summary>
 public class EditorCam : MonoBehaviour
 {
-    public float cameraLookSpeed;
+    public float cameraOrbitSpeed;
     public float cameraMoveSpeed;
-    public float cameraBoostMult;
-    public float cameraSpeedChangeSpeed;
-    public float minSpeedMult;
-    public float maxSpeedMult;
 
-    private float baseSpeedMult = 2f;
-    private Vector3 _prevPos;
-    private Quaternion _prevRot;
+    private Vector3 _focusPoint;
+    
+    public SelectionManager selectionManager;
     
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButton(1))
+        selectionManager.selectionDisabledViaCamera = false;
+        if (Input.GetKey(KeyCode.LeftShift))
         {
+            selectionManager.selectionDisabledViaCamera = true;
             //mouse movement to rotate
-            float mouseX = Input.GetAxis("Mouse X");
-            float mouseY = Input.GetAxis("Mouse Y");
+            //float mouseX = Input.GetAxis("Mouse X");
+            //float mouseY = Input.GetAxis("Mouse Y");
+            float mouseX = Input.mouseScrollDelta.x;
+            float mouseY = Input.mouseScrollDelta.y;
             
             #if UNITY_WEBGL && !UNITY_EDITOR
             mouseX *= 0.1f;
             mouseY *= 0.1f;
             #endif
-            
-            if(mouseX !=0 || mouseY != 0)
-            {
-                transform.forward = Quaternion.Euler(Vector3.up * (mouseX * cameraLookSpeed)) * transform.forward;
-                transform.rotation *= Quaternion.AngleAxis(-mouseY * cameraLookSpeed, Vector3.right);
-            }
 
             //movement
             Vector3 movement = Vector3.zero;
-            if (Input.GetKey(KeyCode.W))
-            {
-                movement += transform.forward;
-            }
-            if(Input.GetKey(KeyCode.A))
-            {
-                movement -= transform.right;
-            }
-            if (Input.GetKey(KeyCode.D))
-            {
-                movement += transform.right;
-            }
-            if (Input.GetKey(KeyCode.S))
-            {
-                movement -= transform.forward;
-            }
-            if (Input.GetKey(KeyCode.E))
-            {
-                movement += Vector3.up;
-            }
-            if (Input.GetKey(KeyCode.Q))
-            {
-                movement -= Vector3.up;
-            }
-
-            //scroll wheel to change base speed
-            baseSpeedMult += Input.mouseScrollDelta.y * cameraSpeedChangeSpeed;
-            baseSpeedMult = Mathf.Clamp(baseSpeedMult, minSpeedMult, maxSpeedMult);
+            movement += Vector3.up * mouseY;
+            movement -= transform.right * mouseX;
 
             if (movement != Vector3.zero)
             {
-                movement.Normalize();
-                float speed = cameraMoveSpeed * baseSpeedMult * (Input.GetKey(KeyCode.LeftShift) ? cameraBoostMult : 1);
-                transform.position += movement * (speed * Time.deltaTime);
+                Vector3 delta = movement * cameraMoveSpeed;
+                transform.position += delta;
+                _focusPoint += delta;
             }
+        }
+        //zoom
+        else if (Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.LeftControl))
+        {
+            Vector3 movement = (_focusPoint - transform.position);
+            Vector3 newPos = transform.position + movement.normalized * Input.mouseScrollDelta.y;
+            if(Vector3.Distance(newPos, _focusPoint) > 0.1f)
+            {
+                transform.position = newPos;
+                transform.LookAt(_focusPoint);
+            }
+        }
+        //orbit
+        else if (Input.mouseScrollDelta != Vector2.zero)
+        {
+            selectionManager.selectionDisabledViaCamera = true;
+            //orbit around focus point
+            //mouse movement to rotate
+            float mouseX = Input.mouseScrollDelta.x;
+            float mouseY = Input.mouseScrollDelta.y;
+            
+            #if UNITY_WEBGL && !UNITY_EDITOR
+            mouseX *= 0.1f;
+            mouseY *= 0.1f;
+            #endif
+
+            Vector3 diff = (transform.position - _focusPoint);
+            float radius = diff.magnitude;
+            float xzLength = Mathf.Sqrt(diff.x * diff.x + diff.z * diff.z);
+            float phi = Mathf.Atan2(diff.y, xzLength);
+            float theta = Mathf.Atan2(diff.z, diff.x);
+            theta -= mouseX * cameraOrbitSpeed;
+            phi += mouseY * cameraOrbitSpeed;
+            phi = Mathf.Clamp(phi, -Mathf.PI / 2 + 0.01f, Mathf.PI / 2 - 0.01f);
+            
+            transform.position = _focusPoint + new Vector3(radius * Mathf.Cos(phi) * Mathf.Cos(theta), 
+                radius * Mathf.Sin(phi), radius * Mathf.Cos(phi) * Mathf.Sin(theta));
+            transform.LookAt(_focusPoint);
         }
     }
 }

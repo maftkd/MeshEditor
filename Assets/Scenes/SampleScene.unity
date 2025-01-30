@@ -775,12 +775,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 908d2b4255ca445259aab81e6c36569e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraLookSpeed: 5
-  cameraMoveSpeed: 5
-  cameraBoostMult: 2
-  cameraSpeedChangeSpeed: 0.1
-  minSpeedMult: 0.1
-  maxSpeedMult: 2
+  cameraOrbitSpeed: 0.25
+  cameraMoveSpeed: 0.25
+  selectionManager: {fileID: 1546355039}
 --- !u!1 &1283999590 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7706853491431558013, guid: 239434eacacdb4f8db2c188917386d5c, type: 3}
@@ -1067,6 +1064,7 @@ MonoBehaviour:
   clickPhysics: {fileID: 145900049}
   mesh: {fileID: 328348343}
   selectionDisabled: 0
+  selectionDisabledViaCamera: 0
   modeText: {fileID: 1358652976}
   selectionMode: 0
 --- !u!4 &1546355040
