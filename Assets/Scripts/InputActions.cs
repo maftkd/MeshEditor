@@ -53,3 +53,13 @@ public class DuplicateAction : IInputAction
         this.previousSelection = previousSelection;
     }
 }
+
+public class FormationAction : IInputAction
+{
+    public ISelectionPrimitive newPrimitive;
+    
+    public FormationAction(ISelectionPrimitive newPrimitive)
+    {
+        this.newPrimitive = newPrimitive;
+    }
+}

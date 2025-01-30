@@ -192,7 +192,7 @@ public class SelectionManager : MonoBehaviour
         }
     }
 
-    void Select(ISelectionPrimitive prim)
+    public void Select(ISelectionPrimitive prim)
     {
         _selection.Add(prim);
         switch (prim)
@@ -219,7 +219,7 @@ public class SelectionManager : MonoBehaviour
         prim.selected = true;
     }
     
-    void Deselect(ISelectionPrimitive prim)
+    public void Deselect(ISelectionPrimitive prim)
     {
         _selection.Remove(prim);
         switch (prim)
