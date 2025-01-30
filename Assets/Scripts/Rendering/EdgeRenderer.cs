@@ -26,6 +26,7 @@ public class EdgeRenderer : MonoBehaviour
         GL.Begin(GL.LINES);
         foreach (Edge e in mesh.edges)
         {
+            /*
             if (e.selected)
             {
                 GL.Color(Color.green);
@@ -33,9 +34,11 @@ public class EdgeRenderer : MonoBehaviour
             else
             {
                 GL.Color(Color.black);
-                
             }
+            */
+            GL.Color(e.a.selected ? Color.green : Color.black);
             GL.Vertex(e.a.position);
+            GL.Color(e.b.selected ? Color.green : Color.black);
             GL.Vertex(e.b.position);
         }
         GL.End();
