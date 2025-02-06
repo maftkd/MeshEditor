@@ -180,27 +180,12 @@ public class SelectionManager : MonoBehaviour
                 Shader.SetGlobalVector("_Box", new Vector4(boxMinX, Screen.height - boxMaxY, 
                     boxMaxX, Screen.height - boxMinY));
                 
+                // leaving this here because it shows how to get a normalized box which we will use later
+                // when adding back box selection
+                /*
                 Vector4 selectionBox = new Vector4(boxMinX / Screen.width, boxMinY / Screen.height, 
                     boxMaxX / Screen.width, boxMaxY / Screen.height);
-                List<ISelectionPrimitive> newSelection = clickPhysics.FrustumOverlap(selectionBox, selectionMode);
-                ClearSelection();
-                if (Input.GetKey(KeyCode.LeftShift))
-                {
-                    foreach (ISelectionPrimitive prim in _prevSelection)
-                    {
-                        Select(prim);
-                    }
-                }
-                foreach(ISelectionPrimitive prim in newSelection)
-                {
-                    if (!_selection.Contains(prim))
-                    {
-                        Select(prim);
-                    }
-                }
-
-                SelectionChanged?.Invoke();
-                    
+                    */
             }
         }
         else if (Input.GetMouseButtonUp(0))
@@ -210,6 +195,9 @@ public class SelectionManager : MonoBehaviour
             {
                 return;
             }
+            
+            //todo add back box selection here
+            
             UndoRedoStack.Instance.Push(new SelectAction(_prevSelection, _selection));
             Shader.SetGlobalVector("_Box", Vector4.zero);
             
