@@ -34,7 +34,6 @@ public class EditorCam : MonoBehaviour
         
         if (Input.GetKey(KeyCode.LeftShift))
         {
-            selectionManager.selectionDisabledViaCamera = true;
             //mouse movement to rotate
             //float mouseX = Input.GetAxis("Mouse X");
             //float mouseY = Input.GetAxis("Mouse Y");
@@ -45,6 +44,13 @@ public class EditorCam : MonoBehaviour
             mouseX *= 0.1f;
             mouseY *= 0.1f;
             #endif
+
+            if (mouseX == 0 && mouseY == 0)
+            {
+                return;
+            }
+            
+            selectionManager.selectionDisabledViaCamera = true;
 
             //movement
             Vector3 movement = Vector3.zero;
