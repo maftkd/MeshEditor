@@ -74,6 +74,24 @@ public class SelectionManager : MonoBehaviour
             return v==a || v==b;
         }
     }
+
+    public class Loop : ISelectionPrimitive
+    {
+        public Vertex start;
+        public Edge edge;
+        public bool selected { get; set; }
+
+        public Loop(Vertex v, Edge e)
+        {
+            start = v;
+            edge = e;
+        }
+        
+        public ISelectionPrimitive Copy()
+        {
+            return new Loop(start, edge);
+        }
+    }
     
     public SelectionMode selectionMode = SelectionMode.Vertex;
     
@@ -482,6 +500,20 @@ public class SelectionManager : MonoBehaviour
 
         center /= count;
         return true;
+    }
+
+    public List<ISelectionPrimitive> GetSelectionByType(Type t)
+    {
+        List<ISelectionPrimitive> result = new();
+        foreach (ISelectionPrimitive prim in selection)
+        {
+            if (prim.GetType() == t)
+            {
+                result.Add(prim);
+            }
+        }
+
+        return result;
     }
 
     //Debuging*******************************************************************************************************

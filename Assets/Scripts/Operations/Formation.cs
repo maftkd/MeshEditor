@@ -5,6 +5,7 @@ using SelectionMode = SelectionManager.SelectionMode;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
 using Vertex = SelectionManager.Vertex;
 using Edge = SelectionManager.Edge;
+using Loop = SelectionManager.Loop;
 
 public class Formation : MonoBehaviour
 {
@@ -43,6 +44,45 @@ public class Formation : MonoBehaviour
                             selectionManager.Select(newEdge);
                             UndoRedoStack.Instance.Push(new FormationAction(newEdge));
                         }
+                    }
+                    break;
+                case SelectionMode.Edge:
+                    // tmp only work if 4 edges are selected
+                    // ideally later we can do something more generic??
+                    List<ISelectionPrimitive> selectedEdges = selectionManager.GetSelectionByType(typeof(Edge));
+                    if (selectedEdges.Count == 4)
+                    {
+                        List<Loop> loops = new List<Loop>();
+                        Edge first = selectedEdges[0] as Edge;
+                        loops.Add(new Loop(first.a, first));
+                        Vertex next = first.b;
+                        selectedEdges.Remove(first);
+                        while (selectedEdges.Count > 0)
+                        {
+                            Edge nextEdge = null;
+                            foreach (Edge e in selectedEdges)
+                            {
+                                if (e.a == next || e.b == next)
+                                {
+                                    nextEdge = e;
+                                    break;
+                                }
+                            }
+                            if (nextEdge == null)
+                            {
+                                Debug.LogError("Invalid edge selection");
+                                break;
+                            }
+                            loops.Add(new Loop(next, nextEdge));
+                            selectedEdges.Remove(nextEdge);
+                            next = nextEdge.a == next ? nextEdge.b : nextEdge.a;
+                            if (next == loops[0].start)
+                            {
+                                break;
+                            }
+                        }
+                        Debug.Log($"Finished loop without error: {loops.Count}");
+                        
                     }
                     break;
                 default:
