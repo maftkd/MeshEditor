@@ -97,11 +97,18 @@ public class DuplicateAction : IInputAction
 
 public class FormationAction : IInputAction
 {
-    public ISelectionPrimitive newPrimitive;
+    //public ISelectionPrimitive newPrimitive;
+    public List<ISelectionPrimitive> newPrimitives;
     
     public FormationAction(ISelectionPrimitive newPrimitive)
     {
-        this.newPrimitive = newPrimitive;
+        this.newPrimitives = new List<ISelectionPrimitive>();
+        this.newPrimitives.Add(newPrimitive);
+    }
+    
+    public FormationAction(List<ISelectionPrimitive> newPrimitives)
+    {
+        this.newPrimitives = newPrimitives;
     }
     
     public void DebugPrint()
@@ -109,7 +116,7 @@ public class FormationAction : IInputAction
         Debug.Log("FormationAction: ");
         Debug.Log("New primitive: ");
         string foo = "";
-        SelectionManager.DebugPrimitive(newPrimitive, ref foo);
+        //SelectionManager.DebugPrimitive(newPrimitive, ref foo);
         Debug.Log(foo);
         Debug.Log("************");
     }

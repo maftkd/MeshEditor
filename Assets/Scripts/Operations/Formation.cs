@@ -52,6 +52,7 @@ public class Formation : MonoBehaviour
                     List<ISelectionPrimitive> selectedVerts = selectionManager.GetSelectionByType(typeof(Vertex));
                     if (selectedEdges.Count >= 2)
                     {
+                        List<ISelectionPrimitive> newlyFormedPrimitives = new List<ISelectionPrimitive>();
                         List<Loop> loops = new List<Loop>();
                         Edge first = selectedEdges[0] as Edge;
                         loops.Add(new Loop(first.a, first));
@@ -125,6 +126,7 @@ public class Formation : MonoBehaviour
                                 mesh.edges.Add(nextEdge);
                                 selectionManager.Select(nextEdge);
                                 selectedEdges.Add(nextEdge);
+                                newlyFormedPrimitives.Add(nextEdge);
                             }
 
                             loops.Add(new Loop(next, nextEdge));
@@ -141,11 +143,14 @@ public class Formation : MonoBehaviour
                         foreach (Loop l in loops)
                         {
                             mesh.loops.Add(l);
+                            newlyFormedPrimitives.Add(l);
                         }
                         Polygon newPoly = new Polygon(loopIndex, loops.Count);
                         PolygonHelper.CalculateNormal(newPoly, mesh);
                         PolygonHelper.Triangulate(newPoly, mesh);
                         mesh.polygons.Add(newPoly);
+                        newlyFormedPrimitives.Add(newPoly);
+                        UndoRedoStack.Instance.Push(new FormationAction(newlyFormedPrimitives));
                     }
                     break;
                 default:
@@ -160,6 +165,25 @@ public class Formation : MonoBehaviour
         {
             if (isUndo)
             {
+                foreach(ISelectionPrimitive prim in formationAction.newPrimitives)
+                {
+                    selectionManager.Deselect(prim);
+                    switch (prim)
+                    {
+                        case Edge e:
+                            mesh.edges.Remove((Edge)prim);
+                            break;
+                        case Loop l:
+                            mesh.loops.Remove((Loop)prim);
+                            break;
+                        case Polygon p:
+                            mesh.polygons.Remove((Polygon)prim);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                /*
                 selectionManager.Deselect(formationAction.newPrimitive);
                 switch (formationAction.newPrimitive)
                 {
@@ -169,9 +193,29 @@ public class Formation : MonoBehaviour
                     default:
                         break;
                 }
+                */
             }
             else
             {
+                foreach(ISelectionPrimitive prim in formationAction.newPrimitives)
+                {
+                    selectionManager.Select(prim);
+                    switch (prim)
+                    {
+                        case Edge e:
+                            mesh.edges.Add((Edge)prim);
+                            break;
+                        case Loop l:
+                            mesh.loops.Add((Loop)prim);
+                            break;
+                        case Polygon p:
+                            mesh.polygons.Add((Polygon)prim);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                /*
                 selectionManager.Select(formationAction.newPrimitive);
                 switch (formationAction.newPrimitive)
                 {
@@ -181,6 +225,7 @@ public class Formation : MonoBehaviour
                     default:
                         break;
                 }
+                */
             }
         }
     }
