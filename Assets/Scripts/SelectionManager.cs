@@ -92,6 +92,24 @@ public class SelectionManager : MonoBehaviour
             return new Loop(start, edge);
         }
     }
+
+    public class Polygon : ISelectionPrimitive
+    {
+        public bool selected { get; set; }
+        public int loopStartIndex;
+        public int numLoops;
+        
+        public Polygon(int loopStartIndex, int numLoops)
+        {
+            this.loopStartIndex = loopStartIndex;
+            this.numLoops = numLoops;
+        }
+
+        public ISelectionPrimitive Copy()
+        {
+            return new Polygon(this.loopStartIndex, this.numLoops);
+        }
+    }
     
     public SelectionMode selectionMode = SelectionMode.Vertex;
     
@@ -386,6 +404,7 @@ public class SelectionManager : MonoBehaviour
         SelectionChanged?.Invoke();
     }
     
+    //todo: delete this
     bool PrimMatchesMode(ISelectionPrimitive prim)
     {
         switch (selectionMode)

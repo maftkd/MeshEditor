@@ -6,6 +6,7 @@ using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
 using Vertex = SelectionManager.Vertex;
 using Edge = SelectionManager.Edge;
 using Loop = SelectionManager.Loop;
+using Polygon = SelectionManager.Polygon;
 
 public class Formation : MonoBehaviour
 {
@@ -49,6 +50,8 @@ public class Formation : MonoBehaviour
                 case SelectionMode.Edge:
                     // tmp only work if 4 edges are selected
                     // ideally later we can do something more generic??
+                    // I think the thing to do to make it generic is to check at the end if the last vertex = the start vertex
+                    // if not, then we will need to plop in a new edge
                     List<ISelectionPrimitive> selectedEdges = selectionManager.GetSelectionByType(typeof(Edge));
                     if (selectedEdges.Count == 4)
                     {
@@ -82,7 +85,12 @@ public class Formation : MonoBehaviour
                             }
                         }
                         Debug.Log($"Finished loop without error: {loops.Count}");
-                        
+                        int loopIndex = mesh.loops.Count;
+                        foreach (Loop l in loops)
+                        {
+                            mesh.loops.Add(l);
+                        }
+                        mesh.polygons.Add(new Polygon(loopIndex, loops.Count));
                     }
                     break;
                 default:
