@@ -92,6 +92,7 @@ public class Formation : MonoBehaviour
                         }
                         Polygon newPoly = new Polygon(loopIndex, loops.Count);
                         PolygonHelper.CalculateNormal(newPoly, mesh);
+                        PolygonHelper.Triangulate(newPoly, mesh);
                         mesh.polygons.Add(newPoly);
                     }
                     break;

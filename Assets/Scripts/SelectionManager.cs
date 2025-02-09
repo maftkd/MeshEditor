@@ -99,6 +99,7 @@ public class SelectionManager : MonoBehaviour
         public int loopStartIndex;
         public int numLoops;
         public Vector3 normal;
+        public List<Vertex> tris;
         
         public Polygon(int loopStartIndex, int numLoops)
         {
@@ -110,6 +111,7 @@ public class SelectionManager : MonoBehaviour
         {
             Polygon newPoly = new Polygon(loopStartIndex, numLoops);
             newPoly.normal = normal;
+            newPoly.tris = new List<Vertex>(tris);
             return newPoly;
         }
     }
