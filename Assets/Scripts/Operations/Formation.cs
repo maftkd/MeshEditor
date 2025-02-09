@@ -48,19 +48,16 @@ public class Formation : MonoBehaviour
                     }
                     break;
                 case SelectionMode.Edge:
-                    // tmp only work if 4 edges are selected
-                    // ideally later we can do something more generic??
-                    // I think the thing to do to make it generic is to check at the end if the last vertex = the start vertex
-                    // if not, then we will need to plop in a new edge
                     List<ISelectionPrimitive> selectedEdges = selectionManager.GetSelectionByType(typeof(Edge));
-                    if (selectedEdges.Count == 4)
+                    List<ISelectionPrimitive> selectedVerts = selectionManager.GetSelectionByType(typeof(Vertex));
+                    if (selectedEdges.Count >= 2)
                     {
                         List<Loop> loops = new List<Loop>();
                         Edge first = selectedEdges[0] as Edge;
                         loops.Add(new Loop(first.a, first));
                         Vertex next = first.b;
                         selectedEdges.Remove(first);
-                        while (selectedEdges.Count > 0)
+                        while (loops.Count < selectedVerts.Count)
                         {
                             Edge nextEdge = null;
                             foreach (Edge e in selectedEdges)
@@ -73,14 +70,69 @@ public class Formation : MonoBehaviour
                             }
                             if (nextEdge == null)
                             {
-                                Debug.LogError("Invalid edge selection");
-                                break;
+                                // we have at least one more selected edge but none are connected to the loop
+                                // so we need to forge a connection here
+                                // first we need to find the vertex that is closest to the current vertex
+                                float minDistance = float.MaxValue;
+                                Vertex closest = null;
+                                foreach (Edge e in selectedEdges)
+                                {
+                                    bool loopContainsA = false;
+                                    bool loopContainsB = false;
+                                    foreach (Loop loop in loops)
+                                    {
+                                        if (loop.start == e.a)
+                                        {
+                                            loopContainsA = true;
+                                        }
+                                        if (loop.start == e.b)
+                                        {
+                                            loopContainsB = true;
+                                        }
+                                    }
+
+                                    if (!loopContainsA)
+                                    {
+                                        float distance = Vector3.Distance(next.position, e.a.position);
+                                        if (distance < minDistance)
+                                        {
+                                            minDistance = distance;
+                                            closest = e.a;
+                                        }
+                                    }
+
+                                    if (!loopContainsB)
+                                    {
+                                        float distance = Vector3.Distance(next.position, e.b.position);
+                                        if (distance < minDistance)
+                                        {
+                                            minDistance = distance;
+                                            closest = e.b;
+                                        }
+                                    }
+                                }
+
+                                if (closest == null)
+                                {
+                                    // this means we had no more selected edges, so it's time to close the loop
+                                    nextEdge = new Edge(next, loops[0].start);
+                                }
+                                else
+                                {
+                                    nextEdge = new Edge(next, closest);
+                                }
+                                
+                                mesh.edges.Add(nextEdge);
+                                selectionManager.Select(nextEdge);
+                                selectedEdges.Add(nextEdge);
                             }
+
                             loops.Add(new Loop(next, nextEdge));
                             selectedEdges.Remove(nextEdge);
                             next = nextEdge.a == next ? nextEdge.b : nextEdge.a;
                             if (next == loops[0].start)
                             {
+                                //Debug.Log("Loop is closed");
                                 break;
                             }
                         }

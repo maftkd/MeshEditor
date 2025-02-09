@@ -110,7 +110,6 @@ public class PolygonHelper
             v.position = inverseRot * v.position;
         }
         
-        Debug.Log($"Found {triangles.Count} triangles");
         poly.tris = triangles;
     }
 
