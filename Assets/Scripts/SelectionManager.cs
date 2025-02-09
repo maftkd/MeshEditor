@@ -98,6 +98,7 @@ public class SelectionManager : MonoBehaviour
         public bool selected { get; set; }
         public int loopStartIndex;
         public int numLoops;
+        public Vector3 normal;
         
         public Polygon(int loopStartIndex, int numLoops)
         {
@@ -107,7 +108,9 @@ public class SelectionManager : MonoBehaviour
 
         public ISelectionPrimitive Copy()
         {
-            return new Polygon(this.loopStartIndex, this.numLoops);
+            Polygon newPoly = new Polygon(loopStartIndex, numLoops);
+            newPoly.normal = normal;
+            return newPoly;
         }
     }
     

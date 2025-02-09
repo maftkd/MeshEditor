@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,14 +12,20 @@ public class TempPolygonRenderer : MonoBehaviour
     private Material _mat;
     public MyMesh mesh;
     public SelectionManager selectionManager;
-    
+    private Camera _cam;
+    public Vector3 lightDirViewSpace;
+
+    private void Start()
+    {
+        _cam = GetComponent<Camera>();
+    }
+
     private void OnPostRender()
     {
         if (_mat == null)
         {
-            Shader tmpShader = Shader.Find("Unlit/Color");
+            Shader tmpShader = Shader.Find("Unlit/Edge");
             _mat = new Material(tmpShader);
-            _mat.color = Color.red;
         }
 
         _mat.SetPass(0);
@@ -28,6 +35,10 @@ public class TempPolygonRenderer : MonoBehaviour
         GL.Begin(GL.QUADS);
         foreach (Polygon poly in mesh.polygons)
         {
+            Vector3 viewNorm = _cam.worldToCameraMatrix * new Vector4(poly.normal.x, poly.normal.y, poly.normal.z, 0.0f);
+            float dt = -Vector3.Dot(viewNorm, lightDirViewSpace.normalized) * 0.5f + 0.5f;
+            float lighting = Mathf.Lerp(0.3f, 0.6f, dt);
+            GL.Color(Color. white * lighting);
             for(int i = poly.loopStartIndex; i < poly.loopStartIndex + poly.numLoops; i++)
             {
                 Loop loop = mesh.loops[i];

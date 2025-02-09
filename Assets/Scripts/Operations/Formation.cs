@@ -90,7 +90,9 @@ public class Formation : MonoBehaviour
                         {
                             mesh.loops.Add(l);
                         }
-                        mesh.polygons.Add(new Polygon(loopIndex, loops.Count));
+                        Polygon newPoly = new Polygon(loopIndex, loops.Count);
+                        PolygonHelper.CalculateNormal(newPoly, mesh);
+                        mesh.polygons.Add(newPoly);
                     }
                     break;
                 default:
