@@ -249,6 +249,10 @@ public class SelectionManager : MonoBehaviour
 
     public void Select(ISelectionPrimitive prim)
     {
+        if (_selection.Contains(prim))
+        {
+            return;
+        }
         _selection.Add(prim);
         prim.selected = true;
         switch (prim)
@@ -286,6 +290,10 @@ public class SelectionManager : MonoBehaviour
     
     public void Deselect(ISelectionPrimitive prim)
     {
+        if (!_selection.Contains(prim))
+        {
+            return;
+        }
         _selection.Remove(prim);
         prim.selected = false;
         switch (prim)
@@ -566,6 +574,12 @@ public class SelectionManager : MonoBehaviour
                 break;
             case Edge e:
                 dbg += $"Edge: {e.a.position} - {e.b.position}\n";
+                break;
+            case Loop l:
+                dbg += $"Loop: {l.start.position} - {l.edge.a.position} - {l.edge.b.position}\n";
+                break;
+            case Polygon p:
+                dbg += $"Polygon: {p.loopStartIndex} - {p.numLoops}\n";
                 break;
         }
     }

@@ -11,7 +11,9 @@ public class UndoRedoStack : MonoBehaviour
     
     public static UndoRedoStack Instance;
 
+    [Header("Debug")]
     public bool debugAllActions;
+    public SelectionManager selectionManagerForDebugging;
 
     private void Awake()
     {
@@ -51,6 +53,8 @@ public class UndoRedoStack : MonoBehaviour
                 Debug.Log("Undo:");
                 action.DebugPrint();
             }
+            
+            //SelectionManager.DebugPrimitiveList(selectionManagerForDebugging.selection);
         }
     }
 
@@ -80,5 +84,7 @@ public class UndoRedoStack : MonoBehaviour
             Debug.Log("Perform:");
             action.DebugPrint();
         }
+
+        //SelectionManager.DebugPrimitiveList(selectionManagerForDebugging.selection);
     }
 }

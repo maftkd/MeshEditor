@@ -316,6 +316,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   debugAllActions: 0
+  selectionManagerForDebugging: {fileID: 1546355039}
 --- !u!4 &339584624
 Transform:
   m_ObjectHideFlags: 0
