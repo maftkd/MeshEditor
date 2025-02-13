@@ -364,6 +364,11 @@ public class SelectionManager : MonoBehaviour
         SelectionChanged?.Invoke();
     }
     
+    public void InvokeSelectionChanged()
+    {
+        SelectionChanged?.Invoke();
+    }
+    
     void OnUndoRedo(IInputAction action, bool wasUndo)
     {
         if (action is SelectAction selectAction)

@@ -302,6 +302,7 @@ public class Formation : MonoBehaviour
                     }
                 }
             }
+            selectionManager.InvokeSelectionChanged();
         }
     }
 }
