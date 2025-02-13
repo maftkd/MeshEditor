@@ -22,10 +22,10 @@ public class MyMesh : MonoBehaviour
         vertices.Add(new Vertex(new Vector3(-0.5f, 0.5f, 0)));
         
         //edges
-        edges.Add(new Edge(vertices[0], vertices[1]));
-        edges.Add(new Edge(vertices[1], vertices[2]));
-        edges.Add(new Edge(vertices[2], vertices[3]));
-        edges.Add(new Edge(vertices[3], vertices[0]));
+        //edges.Add(new Edge(vertices[0], vertices[1]));
+        //edges.Add(new Edge(vertices[1], vertices[2]));
+        //edges.Add(new Edge(vertices[2], vertices[3]));
+        //edges.Add(new Edge(vertices[3], vertices[0]));
         
         //don't initialize any loops / faces for now since we are trying to test the ability to create a face
         

@@ -32,9 +32,13 @@ public class Formation : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F))
         {
+            List<ISelectionPrimitive> selectedEdges = selectionManager.GetSelectionByType(typeof(Edge));
+            List<ISelectionPrimitive> selectedVerts = selectionManager.GetSelectionByType(typeof(Vertex));
             switch (selectionManager.selectionMode)
             {
                 case SelectionMode.Vertex:
+                    //simplest case where two vertices come together to form an edge
+                    //note that we can assume that if there are only 2 items selected in vertex mode, they are both vertices
                     if (selectionManager.selection.Count == 2)
                     {
                         if (selectionManager.selection[0] is Vertex a &&
@@ -46,10 +50,103 @@ public class Formation : MonoBehaviour
                             UndoRedoStack.Instance.Push(new FormationAction(newEdge));
                         }
                     }
+                    else
+                    {
+                        if (selectedVerts.Count >= 3)
+                        {
+                            List<ISelectionPrimitive> newlyFormedPrimitives = new List<ISelectionPrimitive>();
+                            List<Loop> loops = new List<Loop>();
+                            //Vertex first = selectedVerts[0] as Vertex;
+                            //loops.Add(new Loop(first.a, first));
+                            //Vertex next = first.b;
+                            Vertex next = selectedVerts[0] as Vertex;
+                            //selectedEdges.Remove(first);
+                            while (loops.Count < selectedVerts.Count)
+                            {
+                                Edge nextEdge = null;
+                                foreach (Edge e in selectedEdges)
+                                {
+                                    if (e.a == next || e.b == next)
+                                    {
+                                        nextEdge = e;
+                                        break;
+                                    }
+                                }
+                                if (nextEdge == null)
+                                {
+                                    // first we need to find the vertex that is closest to the current vertex
+                                    float minDistance = float.MaxValue;
+                                    Vertex closest = null;
+                                    foreach (Vertex v in selectedVerts)
+                                    {
+                                        if (v == next)
+                                        {
+                                            continue;
+                                        }
+                                        
+                                        bool loopContainsVert = false;
+                                        foreach (Loop loop in loops)
+                                        {
+                                            if (loop.start == v)
+                                            {
+                                                loopContainsVert = true;
+                                            }
+                                        }
+
+                                        if (!loopContainsVert)
+                                        {
+                                            float distance = Vector3.Distance(next.position, v.position);
+                                            if (distance < minDistance)
+                                            {
+                                                minDistance = distance;
+                                                closest = v;
+                                            }
+                                        }
+                                    }
+
+                                    if (closest == null)
+                                    {
+                                        // this means we had no more selected edges, so it's time to close the loop
+                                        nextEdge = new Edge(next, loops[0].start);
+                                    }
+                                    else
+                                    {
+                                        nextEdge = new Edge(next, closest);
+                                    }
+                                    
+                                    mesh.edges.Add(nextEdge);
+                                    selectionManager.Select(nextEdge);
+                                    selectedEdges.Add(nextEdge);
+                                    newlyFormedPrimitives.Add(nextEdge);
+                                }
+
+                                loops.Add(new Loop(next, nextEdge));
+                                selectedEdges.Remove(nextEdge);
+                                next = nextEdge.a == next ? nextEdge.b : nextEdge.a;
+                                if (next == loops[0].start)
+                                {
+                                    //Debug.Log("Loop is closed");
+                                    break;
+                                }
+                            }
+                            Debug.Log($"Finished loop without error: {loops.Count}");
+                            int loopIndex = mesh.loops.Count;
+                            foreach (Loop l in loops)
+                            {
+                                mesh.loops.Add(l);
+                                newlyFormedPrimitives.Add(l);
+                            }
+                            Polygon newPoly = new Polygon(loopIndex, loops.Count);
+                            PolygonHelper.CalculateNormal(newPoly, mesh);
+                            PolygonHelper.Triangulate(newPoly, mesh);
+                            mesh.polygons.Add(newPoly);
+                            newlyFormedPrimitives.Add(newPoly);
+                            UndoRedoStack.Instance.Push(new FormationAction(newlyFormedPrimitives));
+                        }
+                            
+                    }
                     break;
                 case SelectionMode.Edge:
-                    List<ISelectionPrimitive> selectedEdges = selectionManager.GetSelectionByType(typeof(Edge));
-                    List<ISelectionPrimitive> selectedVerts = selectionManager.GetSelectionByType(typeof(Vertex));
                     if (selectedEdges.Count >= 2)
                     {
                         List<ISelectionPrimitive> newlyFormedPrimitives = new List<ISelectionPrimitive>();
@@ -171,29 +268,18 @@ public class Formation : MonoBehaviour
                     switch (prim)
                     {
                         case Edge e:
-                            mesh.edges.Remove((Edge)prim);
+                            mesh.edges.Remove(e);
                             break;
                         case Loop l:
-                            mesh.loops.Remove((Loop)prim);
+                            mesh.loops.Remove(l);
                             break;
                         case Polygon p:
-                            mesh.polygons.Remove((Polygon)prim);
+                            mesh.polygons.Remove(p);
                             break;
                         default:
                             break;
                     }
                 }
-                /*
-                selectionManager.Deselect(formationAction.newPrimitive);
-                switch (formationAction.newPrimitive)
-                {
-                    case Edge e:
-                        mesh.edges.Remove((Edge)formationAction.newPrimitive);
-                        break;
-                    default:
-                        break;
-                }
-                */
             }
             else
             {
@@ -203,29 +289,18 @@ public class Formation : MonoBehaviour
                     switch (prim)
                     {
                         case Edge e:
-                            mesh.edges.Add((Edge)prim);
+                            mesh.edges.Add(e);
                             break;
                         case Loop l:
-                            mesh.loops.Add((Loop)prim);
+                            mesh.loops.Add(l);
                             break;
                         case Polygon p:
-                            mesh.polygons.Add((Polygon)prim);
+                            mesh.polygons.Add(p);
                             break;
                         default:
                             break;
                     }
                 }
-                /*
-                selectionManager.Select(formationAction.newPrimitive);
-                switch (formationAction.newPrimitive)
-                {
-                    case Edge e:
-                        mesh.edges.Add((Edge)formationAction.newPrimitive);
-                        break;
-                    default:
-                        break;
-                }
-                */
             }
         }
     }
