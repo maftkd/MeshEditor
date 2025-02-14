@@ -4,6 +4,7 @@ using SelectionMode = SelectionManager.SelectionMode;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
 using Vertex = SelectionManager.Vertex;
 using Edge = SelectionManager.Edge;
+using Polygon = SelectionManager.Polygon;
 
 public class ClickPhysics : MonoBehaviour
 {
@@ -25,6 +26,8 @@ public class ClickPhysics : MonoBehaviour
                 return RaycastVertices(ray);
             case SelectionMode.Edge:
                 return RaycastEdges(ray);
+            case SelectionMode.Face:
+                return RaycastFaces(ray);
             default:
                 return null;
         }
@@ -94,6 +97,34 @@ public class ClickPhysics : MonoBehaviour
         }
 
         return closestEdge;
+    }
+    
+    private Polygon RaycastFaces(Ray ray)
+    {
+        float minT = float.MaxValue;
+        Polygon closestPoly = null;
+        
+        foreach (Polygon p in mesh.polygons)
+        {
+            for (int i = 0; i < p.tris.Count; i += 3)
+            {
+                Vector3 v1 = p.tris[i].position;
+                Vector3 v2 = p.tris[i + 1].position;
+                Vector3 v3 = p.tris[i + 2].position;
+                
+                Vector3 hit = TriIntersect(ray.origin, ray.direction, v1, v2, v3);
+                if (hit.x > 0.0)
+                {
+                    if(hit.x < minT)
+                    {
+                        minT = hit.x;
+                        closestPoly = p;
+                    }
+                }
+            }
+        }
+
+        return closestPoly;
     }
     
     public static bool RaycastMouseToPlaneAtPoint(Vector3 point, Camera cam, out Vector3 hit)
@@ -232,6 +263,21 @@ public class ClickPhysics : MonoBehaviour
             if( h>0.0 ) return -b - Mathf.Sqrt(h);
         }
         return -1.0f;
+    }
+    
+    Vector3 TriIntersect( in Vector3 ro, in Vector3 rd, in Vector3 v0, in Vector3 v1, in Vector3 v2 )
+    {
+        Vector3 v1v0 = v1 - v0;
+        Vector3 v2v0 = v2 - v0;
+        Vector3 rov0 = ro - v0;
+        Vector3  n = Vector3.Cross( v1v0, v2v0 );
+        Vector3  q = Vector3.Cross( rov0, rd );
+        float d = 1.0f / Vector3.Dot( rd, n );
+        float u = d*Vector3.Dot( -q, v2v0 );
+        float v = d*Vector3.Dot(  q, v1v0 );
+        float t = d*Vector3.Dot( -n, rov0 );
+        if( u<0.0 || v<0.0 || (u+v)>1.0 ) t = -1.0f;
+        return new Vector3( t, u, v );
     }
     
     // https://stackoverflow.com/questions/99353/how-to-test-if-a-line-segment-intersects-an-axis-aligned-rectange-in-2d

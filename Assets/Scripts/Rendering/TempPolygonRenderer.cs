@@ -38,7 +38,8 @@ public class TempPolygonRenderer : MonoBehaviour
             Vector3 viewNorm = _cam.worldToCameraMatrix * new Vector4(poly.normal.x, poly.normal.y, poly.normal.z, 0.0f);
             float dt = -Vector3.Dot(viewNorm, lightDirViewSpace.normalized) * 0.5f + 0.5f;
             float lighting = Mathf.Lerp(0.3f, 0.6f, dt);
-            GL.Color(Color. white * lighting);
+            Color baseCol = poly.selected ? new Color(0.75f, 1.5f, 0.75f) : Color.white;
+            GL.Color(baseCol * lighting);
             foreach (Vertex v in poly.tris)
             {
                 GL.Vertex(v.position);
