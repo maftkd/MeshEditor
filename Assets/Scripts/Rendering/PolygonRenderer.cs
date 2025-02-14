@@ -7,7 +7,7 @@ using Edge = SelectionManager.Edge;
 using Loop = SelectionManager.Loop;
 using Polygon = SelectionManager.Polygon;
 
-public class TempPolygonRenderer : MonoBehaviour
+public class PolygonRenderer : MonoBehaviour
 {
     private Material _mat;
     public MyMesh mesh;
@@ -44,13 +44,6 @@ public class TempPolygonRenderer : MonoBehaviour
             {
                 GL.Vertex(v.position);
             }
-            /*
-            for(int i = poly.loopStartIndex; i < poly.loopStartIndex + poly.numLoops; i++)
-            {
-                Loop loop = mesh.loops[i];
-                GL.Vertex(loop.start.position);
-            }
-            */
         }
         GL.End();
         
