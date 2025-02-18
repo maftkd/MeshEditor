@@ -73,11 +73,13 @@ public class Deletion : MonoBehaviour
             else if (selectionManager.selectionMode == SelectionMode.Edge)
             {
                 //remove edges
+                List<Edge> deletedEdges = new();
                 foreach (ISelectionPrimitive prim in prevSelection)
                 {
                     if (prim is Edge e)
                     {
                         deletedPrimitives.Add(e);
+                        deletedEdges.Add(e);
 
                         foreach(Loop l in myMesh.loops)
                         {
@@ -100,6 +102,105 @@ public class Deletion : MonoBehaviour
                 }
                 
                 //also remove vertices associated with those edges that aren't shared with any other remaining edges
+                foreach(Edge edge in deletedEdges)
+                {
+                    //check other edges against vert a
+                    bool vertexSharedWithRemainingEdge = false;
+                    foreach (Edge e in myMesh.edges)
+                    {
+                        if (e.Contains(edge.a) && !deletedPrimitives.Contains(e))
+                        {
+                            vertexSharedWithRemainingEdge = true;
+                            break;
+                        }
+                    }
+                    if(!vertexSharedWithRemainingEdge)
+                    {
+                        deletedPrimitives.Add(edge.a);
+                    }
+                    
+                    //check other edges against vert b
+                    vertexSharedWithRemainingEdge = false;
+                    foreach (Edge e in myMesh.edges)
+                    {
+                        if (e.Contains(edge.b) && !deletedPrimitives.Contains(e))
+                        {
+                            vertexSharedWithRemainingEdge = true;
+                            break;
+                        }
+                    }
+                    if(!vertexSharedWithRemainingEdge)
+                    {
+                        deletedPrimitives.Add(edge.b);
+                    }
+                }
+            }
+            else if (selectionManager.selectionMode == SelectionMode.Face)
+            {
+                List<Loop> deletedLoops = new();
+                //remove edges
+                foreach (ISelectionPrimitive prim in prevSelection)
+                {
+                    if (prim is Polygon p)
+                    {
+                        deletedPrimitives.Add(p);
+                        foreach(Loop loop in myMesh.loops.GetRange(p.loopStartIndex, p.numLoops))
+                        {
+                            deletedPrimitives.Add(loop);
+                            deletedLoops.Add(loop);
+                        }
+                    }
+                }
+                
+                //also remove edges associated with those polys that aren't shared with any other polys
+                foreach (Loop loop in deletedLoops)
+                {
+                    Edge e = loop.edge;
+                    if (deletedPrimitives.Contains(e))
+                    {
+                        continue;
+                    }
+                    
+                    bool edgeSharedWithRemainingPoly = false;
+                    foreach (Polygon p in myMesh.polygons)
+                    {
+                        if (p.ContainsEdge(myMesh, e) && !deletedPrimitives.Contains(p))
+                        {
+                            edgeSharedWithRemainingPoly = true;
+                            break;
+                        }
+                    }
+                    if(!edgeSharedWithRemainingPoly)
+                    {
+                        deletedPrimitives.Add(e);
+                    }
+                }
+                
+                //also remove vertices associated with those polys that aren't shared with any other remaining edges
+                foreach (Loop loop in deletedLoops)
+                {
+                    Vertex v = loop.start;
+                    if (deletedPrimitives.Contains(v))
+                    {
+                        continue;
+                    }
+                    
+                    bool vertexSharedWithRemainingEdge = false;
+                    foreach (Edge e in myMesh.edges)
+                    {
+                        if (e.Contains(v) && !deletedPrimitives.Contains(v))
+                        {
+                            vertexSharedWithRemainingEdge = true;
+                            break;
+                        }
+                    }
+                    if(!vertexSharedWithRemainingEdge)
+                    {
+                        deletedPrimitives.Add(v);
+                    }
+                }
+                
+                /*
                 foreach (Vertex v in myMesh.vertices)
                 {
                     bool vertexShsaredWithRemainingEdge = false;
@@ -116,6 +217,7 @@ public class Deletion : MonoBehaviour
                         deletedPrimitives.Add(v);
                     }
                 }
+                */
             }
 
             foreach (ISelectionPrimitive prim in deletedPrimitives)

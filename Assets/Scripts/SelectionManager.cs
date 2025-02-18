@@ -120,6 +120,32 @@ public class SelectionManager : MonoBehaviour
             int loopIndex = mesh.loops.IndexOf(l);
             return loopIndex >= loopStartIndex && loopIndex < loopStartIndex + numLoops;
         }
+        
+        public bool ContainsVertex(Vertex v)
+        {
+            foreach (Vertex tri in tris)
+            {
+                if (tri == v)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool ContainsEdge(MyMesh mesh, Edge e)
+        {
+            foreach(Loop l in mesh.loops.GetRange(loopStartIndex, numLoops))
+            {
+                if (l.edge == e)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
     
     public SelectionMode selectionMode = SelectionMode.Vertex;
