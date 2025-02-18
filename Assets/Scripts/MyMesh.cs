@@ -34,19 +34,33 @@ public class MyMesh : MonoBehaviour
         CreateFace(vertices[4], vertices[5], vertices[1], vertices[0]); //bottom face
     }
 
+    Edge CreateEdgeIfNeeded(Vertex a, Vertex b)
+    {
+        foreach (Edge e in edges)
+        {
+            if(e.a == a && e.b == b || e.a == b && e.b == a)
+            {
+                return e;
+            }
+        }
+        Edge newEdge = new Edge(a, b);
+        edges.Add(newEdge);
+        return newEdge;
+    }
+
     void CreateFace(Vertex a, Vertex b, Vertex c, Vertex d)
     {
         //edges
-        edges.Add(new Edge(a, b));
-        edges.Add(new Edge(b, c));
-        edges.Add(new Edge(c, d));
-        edges.Add(new Edge(d, a));
+        Edge edgeA = CreateEdgeIfNeeded(a, b);
+        Edge edgeB = CreateEdgeIfNeeded(b, c);
+        Edge edgeC = CreateEdgeIfNeeded(c, d);
+        Edge edgeD = CreateEdgeIfNeeded(d, a);
         
         //loops
-        loops.Add(new Loop(a, edges[^4]));
-        loops.Add(new Loop(b, edges[^3]));
-        loops.Add(new Loop(c, edges[^2]));
-        loops.Add(new Loop(d, edges[^1]));
+        loops.Add(new Loop(a, edgeA));
+        loops.Add(new Loop(b, edgeB));
+        loops.Add(new Loop(c, edgeC));
+        loops.Add(new Loop(d, edgeD));
         
         //polygon
         polygons.Add(new Polygon(loops.Count - 4, 4));
