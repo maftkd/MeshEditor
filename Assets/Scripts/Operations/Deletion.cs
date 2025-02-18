@@ -1,9 +1,12 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
 using SelectionMode = SelectionManager.SelectionMode;
 using Vertex = SelectionManager.Vertex;
 using Edge = SelectionManager.Edge;
+using Loop = SelectionManager.Loop;
+using Polygon = SelectionManager.Polygon;
 
 public class Deletion : MonoBehaviour
 {
@@ -48,13 +51,23 @@ public class Deletion : MonoBehaviour
                                     deletedPrimitives.Add(e);
                                 }
                             }
-                            break;
-                        case Edge e:
-                            if (!deletedPrimitives.Contains(e))
+                            foreach(Loop l in myMesh.loops)
                             {
-                                deletedPrimitives.Add(e);
+                                if (l.start == v && !deletedPrimitives.Contains(l))
+                                {
+                                    foreach(Polygon poly in myMesh.polygons)
+                                    {
+                                        if (poly.ContainsLoop(myMesh, l) && !deletedPrimitives.Contains(poly))
+                                        {
+                                            deletedPrimitives.Add(poly);
+                                            foreach(Loop loop in myMesh.loops.GetRange(poly.loopStartIndex, poly.numLoops))
+                                            {
+                                                deletedPrimitives.Add(loop);
+                                            }
+                                        }
+                                    }
+                                }
                             }
-                            //myMesh.edges.Remove(e);
                             break;
                     }
                 }
@@ -99,6 +112,21 @@ public class Deletion : MonoBehaviour
                     case Edge e:
                         myMesh.edges.Remove(e);
                         break;
+                    case Polygon p:
+                        int loopStart = p.loopStartIndex;
+                        myMesh.polygons.Remove(p);
+                        for (int i = 0; i < p.numLoops; i++)
+                        {
+                            myMesh.loops.RemoveAt(loopStart);
+                        }
+                        foreach(Polygon poly in myMesh.polygons)
+                        {
+                            if (poly.loopStartIndex > loopStart)
+                            {
+                                poly.loopStartIndex -= p.numLoops;
+                            }
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -124,6 +152,13 @@ public class Deletion : MonoBehaviour
                         case Edge e:
                             myMesh.edges.Add(e);
                             break;
+                        case Loop l:
+                            myMesh.loops.Add(l);
+                            break;
+                        case Polygon p:
+                            p.loopStartIndex = myMesh.loops.Count;
+                            myMesh.polygons.Add(p);
+                            break;
                     }
                 }
                 selectionManager.SetSelection(deleteAction.previousSelection);
@@ -146,6 +181,20 @@ public class Deletion : MonoBehaviour
                             if (selectionManager.selectionMode == SelectionMode.Edge)
                             {
                                 selectionManager.Deselect(e);
+                            }
+                            break;
+                        case Loop l:
+                            myMesh.loops.Remove(l);
+                            if (selectionManager.selectionMode == SelectionMode.Face)
+                            {
+                                selectionManager.Deselect(l);
+                            }
+                            break;
+                        case Polygon p:
+                            myMesh.polygons.Remove(p);
+                            if (selectionManager.selectionMode == SelectionMode.Face)
+                            {
+                                selectionManager.Deselect(p);
                             }
                             break;
                     }
