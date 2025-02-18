@@ -38,37 +38,35 @@ public class Deletion : MonoBehaviour
             {
                 foreach (ISelectionPrimitive prim in prevSelection)
                 {
-                    switch (prim)
+                    if(prim is Vertex v)
                     {
-                        case Vertex v:
-                            deletedPrimitives.Add(v);
-                            
-                            //removing a vertex that belongs to an edge results in deletion of that edge too
-                            foreach (Edge e in myMesh.edges)
+                        deletedPrimitives.Add(v);
+                        
+                        //removing a vertex that belongs to an edge results in deletion of that edge too
+                        foreach (Edge e in myMesh.edges)
+                        {
+                            if (e.Contains(v) && !deletedPrimitives.Contains(e))
                             {
-                                if (e.Contains(v) && !deletedPrimitives.Contains(e))
-                                {
-                                    deletedPrimitives.Add(e);
-                                }
+                                deletedPrimitives.Add(e);
                             }
-                            foreach(Loop l in myMesh.loops)
+                        }
+                        foreach(Loop l in myMesh.loops)
+                        {
+                            if (l.start == v && !deletedPrimitives.Contains(l))
                             {
-                                if (l.start == v && !deletedPrimitives.Contains(l))
+                                foreach(Polygon poly in myMesh.polygons)
                                 {
-                                    foreach(Polygon poly in myMesh.polygons)
+                                    if (poly.ContainsLoop(myMesh, l) && !deletedPrimitives.Contains(poly))
                                     {
-                                        if (poly.ContainsLoop(myMesh, l) && !deletedPrimitives.Contains(poly))
+                                        deletedPrimitives.Add(poly);
+                                        foreach(Loop loop in myMesh.loops.GetRange(poly.loopStartIndex, poly.numLoops))
                                         {
-                                            deletedPrimitives.Add(poly);
-                                            foreach(Loop loop in myMesh.loops.GetRange(poly.loopStartIndex, poly.numLoops))
-                                            {
-                                                deletedPrimitives.Add(loop);
-                                            }
+                                            deletedPrimitives.Add(loop);
                                         }
                                     }
                                 }
                             }
-                            break;
+                        }
                     }
                 }
             }
@@ -80,6 +78,24 @@ public class Deletion : MonoBehaviour
                     if (prim is Edge e)
                     {
                         deletedPrimitives.Add(e);
+
+                        foreach(Loop l in myMesh.loops)
+                        {
+                            if (l.edge == e && !deletedPrimitives.Contains(l))
+                            {
+                                foreach(Polygon poly in myMesh.polygons)
+                                {
+                                    if (poly.ContainsLoop(myMesh, l) && !deletedPrimitives.Contains(poly))
+                                    {
+                                        deletedPrimitives.Add(poly);
+                                        foreach(Loop loop in myMesh.loops.GetRange(poly.loopStartIndex, poly.numLoops))
+                                        {
+                                            deletedPrimitives.Add(loop);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 
