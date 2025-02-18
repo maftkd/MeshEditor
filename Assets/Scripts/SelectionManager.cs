@@ -114,6 +114,12 @@ public class SelectionManager : MonoBehaviour
             newPoly.tris = new List<Vertex>(tris);
             return newPoly;
         }
+
+        public bool ContainsLoop(MyMesh mesh, Loop l)
+        {
+            int loopIndex = mesh.loops.IndexOf(l);
+            return loopIndex >= loopStartIndex && loopIndex < loopStartIndex + numLoops;
+        }
     }
     
     public SelectionMode selectionMode = SelectionMode.Vertex;
@@ -271,18 +277,47 @@ public class SelectionManager : MonoBehaviour
                             }
                         }
                     }
-                    
                 }
                 break;
             case Edge e:
-                if (!e.a.selected)
+                Select(e.a);
+                Select(e.b);
+                foreach (Loop l in mesh.loops)
                 {
-                    Select(e.a);
+                    if (!l.selected && l.edge == e)
+                    {
+                        Select(l);
+                    }
                 }
-
-                if (!e.b.selected)
+                break;
+            case Loop l:
+                Select(l.start);
+                Select(l.edge);
+                foreach (Polygon poly in mesh.polygons)
                 {
-                    Select(e.b);
+                    if (!poly.selected && poly.ContainsLoop(mesh, l))
+                    {
+                        bool shouldBeSelected = true;
+                        foreach (Loop loop in mesh.loops.GetRange(poly.loopStartIndex, poly.numLoops))
+                        {
+                            if (!loop.selected)
+                            {
+                                shouldBeSelected = false;
+                                break;
+                            }
+                        }
+                        
+                        if (shouldBeSelected)
+                        {
+                            Select(poly);
+                        }
+                    }
+                }
+                break;
+            case Polygon p:
+                foreach (Loop l in mesh.loops.GetRange(p.loopStartIndex, p.numLoops))
+                {
+                    Select(l);
                 }
                 break;
         }
@@ -315,16 +350,33 @@ public class SelectionManager : MonoBehaviour
                 }
                 break;
             case Edge e:
-                if (e.a.selected)
+                Deselect(e.a);
+                Deselect(e.b);
+                foreach (Loop l in mesh.loops)
                 {
-                    Deselect(e.a);
-                }
-                if(e.b.selected)
-                {
-                    Deselect(e.b);
+                    if (l.selected && l.edge == e)
+                    {
+                        Deselect(l);
+                    }
                 }
                 break;
-            
+            case Loop l:
+                Deselect(l.start);
+                Deselect(l.edge);
+                foreach (Polygon poly in mesh.polygons)
+                {
+                    if (poly.selected && poly.ContainsLoop(mesh, l))
+                    {
+                        Deselect(poly);
+                    }
+                }
+                break;
+            case Polygon p:
+                foreach(Loop loop in mesh.loops.GetRange(p.loopStartIndex, p.numLoops))
+                {
+                    Deselect(loop);
+                }
+                break;
         }
     }
 
