@@ -234,7 +234,6 @@ public class Formation : MonoBehaviour
                                 break;
                             }
                         }
-                        Debug.Log($"Finished loop without error: {loops.Count}");
                         int loopIndex = mesh.loops.Count;
                         foreach (Loop l in loops)
                         {

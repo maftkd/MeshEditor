@@ -199,25 +199,6 @@ public class Deletion : MonoBehaviour
                         deletedPrimitives.Add(v);
                     }
                 }
-                
-                /*
-                foreach (Vertex v in myMesh.vertices)
-                {
-                    bool vertexShsaredWithRemainingEdge = false;
-                    foreach (Edge e in myMesh.edges)
-                    {
-                        if (e.Contains(v) && !deletedPrimitives.Contains(e))
-                        {
-                            vertexShsaredWithRemainingEdge = true;
-                            break;
-                        }
-                    }
-                    if(!vertexShsaredWithRemainingEdge)
-                    {
-                        deletedPrimitives.Add(v);
-                    }
-                }
-                */
             }
 
             foreach (ISelectionPrimitive prim in deletedPrimitives)

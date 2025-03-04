@@ -139,10 +139,25 @@ public class Duplication : MonoBehaviour
                             myMesh.edges.Remove(e);
                             break;
                         case Loop l:
-                            myMesh.loops.Remove(l);
+                            //myMesh.loops.Remove(l);
                             break;
                         case Polygon p:
+                            //myMesh.polygons.Remove(p);
+                            
+                            int loopStart = p.loopStartIndex;
                             myMesh.polygons.Remove(p);
+                            for (int i = 0; i < p.numLoops; i++)
+                            {
+                                myMesh.loops.RemoveAt(loopStart);
+                            }
+                            foreach(Polygon poly in myMesh.polygons)
+                            {
+                                if (poly.loopStartIndex > loopStart)
+                                {
+                                    poly.loopStartIndex -= p.numLoops;
+                                }
+                            }
+                            
                             break;
                     }
                 }
