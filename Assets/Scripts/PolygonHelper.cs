@@ -6,6 +6,12 @@ using Loop = SelectionManager.Loop;
 
 public class PolygonHelper
 {
+    public static void InitPoly(Polygon poly, MyMesh mesh)
+    {
+        CalculateNormal(poly, mesh);
+        Triangulate(poly, mesh);
+    }
+    
     public static void CalculateNormal(Polygon poly, MyMesh mesh)
     {
         Vector3 center = Vector3.zero;

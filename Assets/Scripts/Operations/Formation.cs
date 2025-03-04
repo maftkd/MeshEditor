@@ -137,8 +137,7 @@ public class Formation : MonoBehaviour
                                 newlyFormedPrimitives.Add(l);
                             }
                             Polygon newPoly = new Polygon(loopIndex, loops.Count);
-                            PolygonHelper.CalculateNormal(newPoly, mesh);
-                            PolygonHelper.Triangulate(newPoly, mesh);
+                            PolygonHelper.InitPoly(newPoly, mesh);
                             mesh.polygons.Add(newPoly);
                             newlyFormedPrimitives.Add(newPoly);
                             UndoRedoStack.Instance.Push(new FormationAction(newlyFormedPrimitives));
@@ -243,8 +242,7 @@ public class Formation : MonoBehaviour
                             newlyFormedPrimitives.Add(l);
                         }
                         Polygon newPoly = new Polygon(loopIndex, loops.Count);
-                        PolygonHelper.CalculateNormal(newPoly, mesh);
-                        PolygonHelper.Triangulate(newPoly, mesh);
+                        PolygonHelper.InitPoly(newPoly, mesh);
                         mesh.polygons.Add(newPoly);
                         newlyFormedPrimitives.Add(newPoly);
                         UndoRedoStack.Instance.Push(new FormationAction(newlyFormedPrimitives));

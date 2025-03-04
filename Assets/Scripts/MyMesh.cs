@@ -64,8 +64,7 @@ public class MyMesh : MonoBehaviour
         
         //polygon
         polygons.Add(new Polygon(loops.Count - 4, 4));
-        PolygonHelper.CalculateNormal(polygons[^1], this);
-        PolygonHelper.Triangulate(polygons[^1], this);
+        PolygonHelper.InitPoly(polygons[^1], this);
     }
 
     // Update is called once per frame

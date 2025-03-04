@@ -429,6 +429,16 @@ public class SelectionManager : MonoBehaviour
             e.selected = true;
             _selection.Add(e);
         }
+        foreach (Loop l in mesh.loops)
+        {
+            l.selected = true;
+            _selection.Add(l);
+        }
+        foreach (Polygon p in mesh.polygons)
+        {
+            p.selected = true;
+            _selection.Add(p);
+        }
         SelectionChanged?.Invoke();
     }
     

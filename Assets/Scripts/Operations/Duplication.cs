@@ -1,12 +1,11 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using ISelectionPrimitive = SelectionManager.ISelectionPrimitive;
 using Vertex = SelectionManager.Vertex;
 using Edge = SelectionManager.Edge;
+using Loop = SelectionManager.Loop;
+using Polygon = SelectionManager.Polygon;
 
 public class Duplication : MonoBehaviour
 {
@@ -37,39 +36,54 @@ public class Duplication : MonoBehaviour
         {
             _duplicatedPrimitives = new List<ISelectionPrimitive>();
             _previousSelection = new List<ISelectionPrimitive>(selectionManager.selection);
-
+            
             Dictionary<Vertex, Vertex> oldToNewVertices = new();
-            //first go through higher-order prims
+            Dictionary<Edge, Edge> oldToNewEdges = new();
+            
+            // verts
+            foreach(ISelectionPrimitive prim in selectionManager.selection)
+            {
+                if (prim is Vertex v)
+                {
+                    Vertex newV = (Vertex)v.Copy();
+                    _duplicatedPrimitives.Add(newV);
+                    oldToNewVertices.Add(v, newV);
+                }
+            }
+            
+            //edges
             foreach (ISelectionPrimitive prim in selectionManager.selection)
             {
                 if (prim is Edge e)
                 {
-                    Vertex newA = oldToNewVertices.ContainsKey(e.a) ? oldToNewVertices[e.a] : (Vertex)e.a.Copy();
-                    Vertex newB = oldToNewVertices.ContainsKey(e.b) ? oldToNewVertices[e.b] : (Vertex)e.b.Copy();
-                    if (!oldToNewVertices.ContainsKey(e.a))
-                    {
-                        oldToNewVertices.Add(e.a, newA);
-                        _duplicatedPrimitives.Add(newA);
-                    }
-                    if (!oldToNewVertices.ContainsKey(e.b))
-                    {
-                        oldToNewVertices.Add(e.b, newB);
-                        _duplicatedPrimitives.Add(newB);
-                    }
+                    Vertex newA = oldToNewVertices[e.a];
+                    Vertex newB = oldToNewVertices[e.b];
                     Edge newEdge = new Edge(newA, newB);
                     _duplicatedPrimitives.Add(newEdge);
+                    oldToNewEdges.Add(e, newEdge);
                 }
             }
             
-            // then lower order
-            foreach(ISelectionPrimitive prim in selectionManager.selection)
+            //polys
+            foreach (ISelectionPrimitive prim in selectionManager.selection)
             {
-                if (prim is Vertex v && !oldToNewVertices.ContainsKey(v))
+                if (prim is Polygon p)
                 {
-                    Vertex newV = (Vertex)v.Copy();
-                    _duplicatedPrimitives.Add(newV);
+                    foreach(Loop l in myMesh.loops.GetRange(p.loopStartIndex, p.numLoops))
+                    {
+                        //assume the verts and edges have already been duplicated
+                        Edge newEdge = oldToNewEdges[l.edge];
+                        Vertex newVert = oldToNewVertices[l.start];
+                        Loop newLoop = new Loop(newVert, newEdge);
+                        _duplicatedPrimitives.Add(newLoop);
+                    }
+                    
+                    Polygon poly = new Polygon(myMesh.loops.Count, p.numLoops);
+                    _duplicatedPrimitives.Add(poly);
                 }
             }
+
+            
 
             foreach (ISelectionPrimitive prim in _duplicatedPrimitives)
             {
@@ -80,6 +94,13 @@ public class Duplication : MonoBehaviour
                         break;
                     case Edge e:
                         myMesh.edges.Add(e);
+                        break;
+                    case Loop l:
+                        myMesh.loops.Add(l);
+                        break;
+                    case Polygon p:
+                        PolygonHelper.InitPoly(p, myMesh);
+                        myMesh.polygons.Add(p);
                         break;
                 }
             }
@@ -117,6 +138,12 @@ public class Duplication : MonoBehaviour
                         case Edge e:
                             myMesh.edges.Remove(e);
                             break;
+                        case Loop l:
+                            myMesh.loops.Remove(l);
+                            break;
+                        case Polygon p:
+                            myMesh.polygons.Remove(p);
+                            break;
                     }
                 }
                 selectionManager.SetSelection(duplicateAction.previousSelection);
@@ -132,6 +159,12 @@ public class Duplication : MonoBehaviour
                             break;
                         case Edge e:
                             myMesh.edges.Add(e);
+                            break;
+                        case Loop l:
+                            myMesh.loops.Add(l);
+                            break;
+                        case Polygon p:
+                            myMesh.polygons.Add(p);
                             break;
                     }
                 }
