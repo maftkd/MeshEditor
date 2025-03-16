@@ -34,3 +34,6 @@ for line in lines
 GL.End();
 ```
 The advantage of this is that we don't have to worry about creating triangle index arrays, and constructing Mesh objects. We don't worry about detecting changes in the geometry, we simply run the same rendering every frame.
+
+## Goals
+The main goal of this project, in addition to simply learning how something like Blender works, is to produce a 3D model and print it out. When that happens, I'll drop a picture of the print below.
